@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { TypewriterProvider, useTypewriter } from "./context/TypewriterContext";
 import { FloatingNav } from "./components/FloatingNav";
 import { TypewriterOverlay } from "./components/TypewriterOverlay";
+import { TypewriterToggle } from "./components/TypewriterToggle";
 
 import { Home } from "./pages/Home";
 import { Manifesto } from "./pages/Manifesto";
@@ -24,7 +25,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const { transition } = useTypewriter();
 
   return (
-    <div className="min-h-screen bg-[#FDFDFB] text-[#1A1A1A] selection:bg-[#D97757] selection:text-[#FDFDFB] font-sans relative">
+    <div className="min-h-screen relative" style={{ background: 'var(--color-paper)', color: 'var(--color-ink)' }}>
+      <TypewriterToggle />
       <FloatingNav />
       <TypewriterOverlay />
       

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import type { ReactNode } from "react";
 
 export interface TransitionState {
   active: boolean;
@@ -10,6 +11,8 @@ export interface TypewriterContextProps {
   transition: TransitionState;
   displayedText: string;
   activeKey: string | null;
+  typewriterEnabled: boolean;
+  toggleTypewriter: () => void;
   triggerTypewriter: (e: React.MouseEvent | null, targetId: string, promptText: string) => void;
 }
 
@@ -19,9 +22,12 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
   const [transition, setTransition] = useState<TransitionState>({ active: false, text: "", targetId: "" });
   const [displayedText, setDisplayedText] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [typewriterEnabled, setTypewriterEnabled] = useState(true);
 
-  const typeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const keyReleaseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const keyReleaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const toggleTypewriter = () => setTypewriterEnabled(prev => !prev);
 
   useEffect(() => {
     if (transition.active) {
@@ -34,13 +40,12 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
           setDisplayedText((prev) => prev + charToType);
 
           setActiveKey(charToType.toLowerCase());
-          clearTimeout(keyReleaseTimeoutRef.current as any);
+          clearTimeout(keyReleaseTimeoutRef.current as ReturnType<typeof setTimeout>);
           keyReleaseTimeoutRef.current = setTimeout(() => setActiveKey(null), 50);
 
           i++;
 
           let nextDelay = Math.random() * 60 + 30;
-
           if (charToType === '.' || charToType === ':' || charToType === '!') nextDelay += 150;
           if (charToType === ' ') nextDelay += 30;
           if (charToType === '\n') nextDelay += 300;
@@ -48,16 +53,6 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
           typeTimeoutRef.current = setTimeout(typeNextChar, nextDelay);
         } else {
           setTimeout(() => {
-            if (transition.targetId && transition.targetId !== 'external') {
-              const el = document.getElementById(transition.targetId);
-              if (el) {
-                const yOffset = -40;
-                const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
-                window.scrollTo({ top: y, behavior: "smooth" });
-              } else if (transition.targetId === "top") {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }
-            }
             setTransition({ active: false, text: "", targetId: "" });
           }, 800);
         }
@@ -66,19 +61,20 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
       typeNextChar();
 
       return () => {
-        clearTimeout(typeTimeoutRef.current as any);
-        clearTimeout(keyReleaseTimeoutRef.current as any);
+        clearTimeout(typeTimeoutRef.current as ReturnType<typeof setTimeout>);
+        clearTimeout(keyReleaseTimeoutRef.current as ReturnType<typeof setTimeout>);
       };
     }
   }, [transition]);
 
   const triggerTypewriter = (e: React.MouseEvent | null, targetId: string, promptText: string) => {
     if (e) e.preventDefault();
+    if (!typewriterEnabled) return; // skip if disabled
     setTransition({ active: true, text: promptText, targetId: targetId });
   };
 
   return (
-    <TypewriterContext.Provider value={{ transition, displayedText, activeKey, triggerTypewriter }}>
+    <TypewriterContext.Provider value={{ transition, displayedText, activeKey, typewriterEnabled, toggleTypewriter, triggerTypewriter }}>
       {children}
     </TypewriterContext.Provider>
   );

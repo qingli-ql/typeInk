@@ -1,4 +1,4 @@
-import React from "react";
+
 import { motion } from "framer-motion";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
 import { Footer } from "../sections/Footer";

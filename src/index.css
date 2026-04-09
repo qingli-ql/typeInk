@@ -1,1 +1,225 @@
 @import "tailwindcss";
+
+/* ===== Design Tokens ===== */
+:root {
+  --color-ink: #2C2925;
+  --color-paper: #FDFDFB;
+  --color-accent: #D97757;
+  --color-muted: #737373;
+  --color-surface: #F4F1EA;
+  --color-dark: #1C1A18;
+  --color-border: #EAE5D9;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'Courier New', Courier, monospace;
+  --font-sans: system-ui, -apple-system, sans-serif;
+}
+
+/* ===== Base ===== */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-paper);
+}
+
+/* ===== Typography ===== */
+.text-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.text-hero {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #111;
+}
+
+.text-accent {
+  color: var(--color-accent);
+  font-style: italic;
+}
+
+.text-body-lg {
+  font-size: clamp(1.1rem, 2.5vw, 1.375rem);
+  line-height: 1.75;
+  color: #555;
+}
+
+.text-mono-xs {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ===== Layout ===== */
+.page-container {
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding-inline: 3rem;
+  }
+}
+
+.section-spacing {
+  padding-block: 5rem;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-block: 8rem;
+  }
+}
+
+.divider {
+  border-top: 1px solid var(--color-border);
+}
+
+/* ===== Components ===== */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--color-ink);
+  color: var(--color-ink);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.btn-ghost:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+  padding-right: 0.75rem;
+}
+
+.card {
+  background: #FFFDFC;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.card:hover {
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.card-dark {
+  background: var(--color-dark);
+  border: 1px solid #333;
+  border-radius: 0.75rem;
+  padding: 2rem;
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.75); }
+}
+
+/* ===== Page Section Headers ===== */
+.section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  color: #111;
+  margin-bottom: 1rem;
+}
+
+/* ===== Typewriter Toggle ===== */
+.tw-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.25s ease;
+}
+
+.tw-toggle.enabled {
+  background: rgba(217,119,87,0.1);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tw-toggle.disabled {
+  background: rgba(0,0,0,0.04);
+  border-color: #ccc;
+  color: #999;
+}
