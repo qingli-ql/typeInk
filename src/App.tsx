@@ -7,6 +7,10 @@ import { TypewriterOverlay } from "./components/TypewriterOverlay";
 
 import { Home } from "./pages/Home";
 import { Manifesto } from "./pages/Manifesto";
+import { BuildsPage } from "./pages/BuildsPage";
+import { UsagePage } from "./pages/UsagePage";
+import { SystemizePage } from "./pages/SystemizePage";
+import { ContactPage } from "./pages/ContactPage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -48,6 +52,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/manifesto" element={<Manifesto />} />
+            <Route path="/builds" element={<BuildsPage />} />
+            <Route path="/usage" element={<UsagePage />} />
+            <Route path="/notes" element={<SystemizePage />} />
+            <Route path="/now" element={<ContactPage />} />
           </Routes>
         </AppLayout>
       </BrowserRouter>
