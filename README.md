@@ -5,7 +5,7 @@
 typeInk is a minimal, distraction-free writing application built with React and TypeScript. Start typing, track your word and character count, and download your work as a plain text file.
 
 ## Getting Started
-
+ 
 ```bash
 npm install
 npm run dev
