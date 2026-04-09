@@ -1,6 +1,7 @@
 {
     "$schema": "./node_modules/wrangler/config-schema.json",
     "name": "type-ink",
+    "account_id": "882ab49d0dcbb9d873ab26982f285862",
     "compatibility_date": "2026-04-09",
     "assets": {
         "directory": "./dist",
