@@ -531,19 +531,19 @@ className = "mt-12 flex items-center gap-3 font-mono text-sm border-b border-[#2
                       className="flex items-center justify-between border-b border-[#CCC] pb-4 hover:text-[#D97757] hover:border-[#D97757] transition-all w-full text-left"
 onClick = {(e) => triggerTypewriter(e, "external", "Opening secure mail client...\nRouting to hello@domain.com")}
                     >
-  <span>Email < /span> <IconArrow / >
+  <span>Email</span> <IconArrow />
   </button>
   < button
 className = "flex items-center justify-between border-b border-[#CCC] pb-4 hover:text-[#D97757] hover:border-[#D97757] transition-all w-full text-left"
 onClick = {(e) => triggerTypewriter(e, "external", "Connecting to GitHub repository...\nFetching public branches.")}
                     >
-  <span>GitHub < /span> <IconArrow / >
+  <span>GitHub</span> <IconArrow />
   </button>
   < button
 className = "flex items-center justify-between border-b border-[#CCC] pb-4 hover:text-[#D97757] hover:border-[#D97757] transition-all w-full text-left"
 onClick = {(e) => triggerTypewriter(e, "external", "Establishing connection to social matrix...\nReady.")}
                     >
-  <span>Social < /span> <IconArrow / >
+  <span>Social</span> <IconArrow />
   </button>
   </div>
   </motion.div>
