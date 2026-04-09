@@ -18,7 +18,7 @@ export const VisualAmbientSystem = () => {
   ];
 
   return (
-    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[450px] h-[380px] flex gap-8 pointer-events-none opacity-40">
+    <div className="w-[450px] h-[380px] flex gap-6 md:gap-8 pointer-events-none opacity-40">
       <div className="flex flex-col gap-8 justify-center font-mono text-[10px] uppercase tracking-widest text-[#2C2925]">
         <div>
           <div className="text-[#999] mb-1">Status</div>

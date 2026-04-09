@@ -1,30 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TypewriterProvider, useTypewriter } from "./context/TypewriterContext";
-import { useParallax } from "./hooks/useParallax";
 import { FloatingNav } from "./components/FloatingNav";
 import { TypewriterOverlay } from "./components/TypewriterOverlay";
-import { BackgroundGlow } from "./components/BackgroundGlow";
-import { Hero } from "./sections/Hero";
-import { Builds } from "./sections/Builds";
-import { Usage } from "./sections/Usage";
-import { Systemize } from "./sections/Systemize";
-import { Contact } from "./sections/Contact";
-import { Footer } from "./sections/Footer";
 
-function AppContent() {
-  const { bgX, bgY, fgX, fgY } = useParallax();
+import { Home } from "./pages/Home";
+import { Manifesto } from "./pages/Manifesto";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+function AppLayout({ children }: { children: React.ReactNode }) {
   const { transition } = useTypewriter();
 
   return (
-    <div className="min-h-screen bg-[#FDFDFB] text-[#1A1A1A] selection:bg-[#D97757] selection:text-[#FDFDFB] font-sans relative overflow-x-hidden">
-      
-      {/* Absolute Overlays */}
+    <div className="min-h-screen bg-[#FDFDFB] text-[#1A1A1A] selection:bg-[#D97757] selection:text-[#FDFDFB] font-sans relative">
       <FloatingNav />
       <TypewriterOverlay />
-      <BackgroundGlow bgX={bgX} bgY={bgY} />
-
-      {/* Main scrolling wrapper */}
+      
       <motion.div
         animate={{
           scale: transition.active ? 0.94 : 1,
@@ -32,18 +31,10 @@ function AppContent() {
           opacity: transition.active ? 0.2 : 1,
         }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col"
+        className="flex flex-col min-h-screen w-full"
       >
-        <main className="relative z-10">
-          <Hero fgX={fgX} fgY={fgY} />
-          <Builds />
-          <Usage />
-          <Systemize />
-          <Contact />
-        </main>
-        <Footer />
+        {children}
       </motion.div>
-
     </div>
   );
 }
@@ -51,7 +42,15 @@ function AppContent() {
 export default function App() {
   return (
     <TypewriterProvider>
-      <AppContent />
+      <BrowserRouter>
+        <ScrollToTop />
+        <AppLayout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/manifesto" element={<Manifesto />} />
+          </Routes>
+        </AppLayout>
+      </BrowserRouter>
     </TypewriterProvider>
   );
 }
