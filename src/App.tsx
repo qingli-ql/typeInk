@@ -12,6 +12,7 @@ import { BuildsPage } from "./pages/BuildsPage";
 import { UsagePage } from "./pages/UsagePage";
 import { SystemizePage } from "./pages/SystemizePage";
 import { ContactPage } from "./pages/ContactPage";
+import { IntimacyIntro, IntimacyQuiz, IntimacyResult } from "./pages/intimacy-test";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -58,6 +59,9 @@ export default function App() {
             <Route path="/usage" element={<UsagePage />} />
             <Route path="/notes" element={<SystemizePage />} />
             <Route path="/now" element={<ContactPage />} />
+            <Route path="/intimacy-test" element={<IntimacyIntro />} />
+            <Route path="/intimacy-test/quiz" element={<IntimacyQuiz />} />
+            <Route path="/intimacy-test/result" element={<IntimacyResult />} />
           </Routes>
         </AppLayout>
       </BrowserRouter>
