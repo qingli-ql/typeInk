@@ -1,4 +1,6 @@
-export const antigravityFadeUp = {
+import { Variants } from "framer-motion";
+
+export const antigravityFadeUp: Variants = {
   hidden: { opacity: 0, y: 60, filter: "blur(8px)", rotateX: -5 },
   visible: {
     opacity: 1,
@@ -9,7 +11,7 @@ export const antigravityFadeUp = {
   }
 };
 
-export const staggerContainer = {
+export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
