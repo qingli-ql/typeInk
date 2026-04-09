@@ -77,6 +77,8 @@ export function IntimacyQuiz() {
   const progress = answered / total;
   const isLast = index === total - 1;
   const canSubmit = answered >= total;
+  const missingCount = total - answered;
+  const firstUnansweredIndex = QUESTIONS.findIndex((q) => answers[q.id] === undefined);
 
   const variants = {
     enter: (d: number) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
@@ -303,6 +305,8 @@ export function IntimacyQuiz() {
                 background: canSubmit ? 'var(--color-accent)' : 'transparent',
                 border: canSubmit ? 'none' : '1px solid var(--color-border)',
               }}
+              aria-disabled={!canSubmit}
+              title={canSubmit ? '提交并查看结果' : `还差 ${missingCount} 题未作答，完成后可提交`}
             >
               查看结果
             </motion.button>
@@ -321,6 +325,31 @@ export function IntimacyQuiz() {
             </button>
           )}
         </div>
+        {isLast && !canSubmit && (
+          <div
+            className="mt-3 flex items-center justify-end gap-2"
+            style={{ fontSize: '0.75rem', color: 'var(--color-muted)' }}
+          >
+            <span>还差 {missingCount} 题未作答，暂时无法提交</span>
+            {firstUnansweredIndex >= 0 && (
+              <button
+                onClick={() => {
+                  setDirection(firstUnansweredIndex > index ? 1 : -1);
+                  setIndex(firstUnansweredIndex);
+                }}
+                className="cursor-pointer rounded-lg px-2 py-1"
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  color: 'var(--color-accent)',
+                  background: 'transparent',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                跳到未完成题
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Quick jump dots */}
         <div className="flex flex-wrap justify-center gap-1.5 mt-8">
