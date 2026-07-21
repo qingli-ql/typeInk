@@ -20,6 +20,10 @@ export const FloatingNav = () => {
   };
 
   const currentPath = location.pathname;
+  const isFocusedAssessmentFlow = currentPath === '/intimacy-test/quiz'
+    || currentPath === '/intimacy-test/result';
+
+  if (isFocusedAssessmentFlow) return null;
 
   return (
     <motion.nav

@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { STORAGE_KEY, DIMENSIONS, RISK_FLAGS } from './data';
-import { computeResult, getScoreLevel } from './scoring';
-import type { AnswerValue, TestResult, DimensionKey } from './types';
+import { DIMENSIONS, RISK_FLAGS } from './data.ts';
+import { computeResult } from './scoring.ts';
+import { clearAssessmentData, loadResult } from './storage.ts';
+import type { DimensionKey, TestResult } from './types.ts';
 
 const dimensionColors: Record<DimensionKey, string> = {
   expression_burden: '#D97757',
   shame_burden: '#b45e8a',
-  relationship_safety: '#7c8db5',
+  relationship_vigilance: '#7c8db5',
   communication_openness: '#5a9e8f',
   self_acceptance: '#8aad6b',
   boundary_expression: '#c4944a',
@@ -16,298 +17,217 @@ const dimensionColors: Record<DimensionKey, string> = {
 
 function ScoreBar({ score, color }: { score: number; color: string }) {
   return (
-    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-border)' }}>
+    <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--color-border)' }}>
       <motion.div
         className="h-full rounded-full"
         style={{ background: color }}
         initial={{ width: 0 }}
         animate={{ width: `${score}%` }}
-        transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
+        transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
       />
     </div>
   );
 }
 
 function ShareCard({ result }: { result: TestResult }) {
-  const [show, setShow] = useState(false);
-  if (!show) {
+  const [expanded, setExpanded] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  if (result.shareLevel === 'none') return null;
+
+  const supportLine = result.shareLevel === 'minimal'
+    ? result.shareRecommendation
+    : result.protectiveHighlights[0] ?? result.recommendations[0];
+  const shareText = [
+    '亲密表达与边界状态自我觉察',
+    result.stateSummary,
+    supportLine,
+    '仅反映最近状态，不替代专业支持。',
+  ].filter(Boolean).join('\n');
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setFeedback('已复制中性摘要');
+    } catch {
+      setFeedback('当前浏览器无法复制，请手动选择文字');
+    }
+  };
+
+  const share = async () => {
+    if (!navigator.share) {
+      await copy();
+      return;
+    }
+    try {
+      await navigator.share({ title: '亲密表达与边界状态自我觉察', text: shareText });
+      setFeedback('已打开系统分享');
+    } catch {
+      setFeedback('已取消分享');
+    }
+  };
+
+  if (!expanded) {
     return (
-      <motion.button
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => setShow(true)}
-        className="w-full cursor-pointer rounded-xl py-3 text-center"
-        style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          color: 'var(--color-muted)',
-          fontSize: '0.85rem',
-        }}
+      <button
+        onClick={() => setExpanded(true)}
+        className="w-full cursor-pointer rounded-lg py-3 text-center"
+        style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-muted)', fontSize: '0.85rem' }}
       >
-        生成分享卡片
-      </motion.button>
+        查看可分享摘要
+      </button>
     );
   }
-  const isMinimal = result.shareLevel === 'minimal';
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="card relative"
-      style={{ background: 'var(--color-surface)' }}
-    >
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ background: 'var(--color-surface)' }}>
       <div className="text-label" style={{ color: 'var(--color-accent)', marginBottom: '0.75rem' }}>
-        亲密表达与边界状态评估
+        亲密表达与边界状态自我觉察
       </div>
-      <p style={{ fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
-        {result.stateSummary}
-      </p>
-      {!isMinimal && result.recommendations.length > 0 && (
-        <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-          {result.recommendations[0]}
-        </p>
-      )}
-      <div className="divider mt-4 pt-3" style={{ fontSize: '0.65rem', color: 'var(--color-muted)' }}>
-        仅反映最近状态 · 不替代专业支持
+      <p style={{ fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>{result.stateSummary}</p>
+      {supportLine && <p style={{ fontSize: '0.82rem', lineHeight: 1.7, color: 'var(--color-muted)' }}>{supportLine}</p>}
+      <div className="divider mt-4 flex flex-wrap gap-2 pt-4">
+        <button onClick={copy} className="cursor-pointer rounded-md px-3 py-2 text-xs" style={{ background: '#fff', border: '1px solid var(--color-border)' }}>
+          复制摘要
+        </button>
+        <button onClick={share} className="cursor-pointer rounded-md px-3 py-2 text-xs" style={{ background: 'var(--color-accent)', border: '1px solid var(--color-accent)', color: '#fff' }}>
+          系统分享
+        </button>
+        <button onClick={() => setExpanded(false)} className="ml-auto cursor-pointer px-2 text-xs" style={{ background: 'none', border: 'none', color: 'var(--color-muted)' }}>
+          收起
+        </button>
       </div>
-      <button
-        onClick={() => setShow(false)}
-        className="absolute top-4 right-4 cursor-pointer"
-        style={{ background: 'none', border: 'none', color: 'var(--color-muted)', fontSize: '0.75rem' }}
-      >
-        ✕
-      </button>
+      {feedback && <p className="mt-3 text-xs" role="status" style={{ color: 'var(--color-muted)' }}>{feedback}</p>}
     </motion.div>
   );
 }
 
 export function IntimacyResult() {
   const navigate = useNavigate();
+  const [storedResult] = useState(() => loadResult());
+  const result = useMemo(() => storedResult ? computeResult(storedResult.answers) : null, [storedResult]);
 
-  // Read answers synchronously from localStorage on mount — no navigate in useEffect
-  const result = useMemo<TestResult | null>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY + '-result-answers');
-      if (!raw) return null;
-      const answers: Record<string, AnswerValue> = JSON.parse(raw);
-      return computeResult(answers);
-    } catch {
-      return null;
-    }
-  }, []);
-
-  // Redirect only if no result
   useEffect(() => {
     if (!result) navigate('/intimacy-test', { replace: true });
   }, [result, navigate]);
 
-  const restart = () => {
-    localStorage.removeItem(STORAGE_KEY + '-result-answers');
-    localStorage.removeItem(STORAGE_KEY + '-answers');
-    navigate('/intimacy-test');
-  };
-
   if (!result) return null;
 
   const hasRisk = result.riskFlags.length > 0;
+  const isInsufficient = result.validity === 'insufficient';
+  const restart = () => {
+    clearAssessmentData();
+    navigate('/intimacy-test/quiz');
+  };
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-paper)', color: 'var(--color-ink)' }}>
-      <div className="max-w-2xl mx-auto px-5 py-12 md:py-20">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="section-eyebrow mb-6"
-        >
-          评估结果
+      <div className="mx-auto max-w-2xl px-5 pb-32 pt-12 md:py-20">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="section-eyebrow mb-6">
+          自我觉察结果 · v2
         </motion.div>
 
-        {/* 1. State Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
+        <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
           <h1 className="section-title" style={{ marginBottom: '0.75rem' }}>
-            当前状态摘要
+            {isInsufficient ? '暂时无法生成完整结果' : '当前状态摘要'}
           </h1>
-          <p className="text-body-lg" style={{ color: 'var(--color-ink)' }}>
-            {result.stateSummary}
-          </p>
-        </motion.div>
+          <p className="text-body-lg" style={{ color: 'var(--color-ink)' }}>{result.stateSummary}</p>
+        </motion.section>
 
-        {/* 2. Risk signals */}
-        {hasRisk && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-xl p-5 mb-8"
-            style={{
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-            }}
-          >
-            <div className="text-label" style={{ color: '#dc2626', marginBottom: '0.75rem' }}>
-              需要优先关注的信号
-            </div>
-            {result.riskFlags.map((flagId) => {
-              const rule = RISK_FLAGS.find((r) => r.id === flagId);
-              if (!rule) return null;
-              return (
-                <div key={flagId} className="mb-3 last:mb-0">
-                  <div style={{ fontSize: '0.85rem', color: '#b91c1c', fontWeight: 500, marginBottom: '0.2rem' }}>
-                    {rule.name}
-                  </div>
-                  <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: '#555' }}>
-                    {rule.message}
-                  </p>
-                </div>
-              );
-            })}
-          </motion.div>
+        {(result.validity === 'partial' || !result.riskAssessmentComplete) && (
+          <div className="mb-8 rounded-lg border px-4 py-3 text-sm leading-6" style={{ borderColor: '#e7c98d', background: '#fffaf0', color: '#705b32' }}>
+            {result.validity === 'partial' && '部分维度因有效答案不足未生成分数。'}
+            {!result.riskAssessmentComplete && '部分风险题信息不足，“未触发”不等于已经排除相关情况。'}
+          </div>
         )}
 
-        {/* 3. Dimension Results */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-8"
-        >
-          <h2 className="section-title" style={{ fontSize: '1.3rem', marginBottom: '1rem' }}>
-            六维度结果
-          </h2>
+        {hasRisk && (
+          <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8 rounded-lg p-5" style={{ background: '#fef5f3', border: '1px solid #f2c7bc' }} aria-labelledby="priority-signals">
+            <h2 id="priority-signals" className="text-label" style={{ color: '#b64f3c', marginBottom: '0.9rem' }}>需要优先关注的信号</h2>
+            <div className="space-y-4">
+              {result.riskFlags.map((flagId) => {
+                const rule = RISK_FLAGS.find((item) => item.id === flagId);
+                if (!rule) return null;
+                return (
+                  <div key={flagId}>
+                    <h3 style={{ fontSize: '0.9rem', color: '#943f31', fontWeight: 600, marginBottom: '0.25rem' }}>{rule.name}</h3>
+                    <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: '#555' }}>{rule.message}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-5 border-t pt-4 text-sm leading-6" style={{ borderColor: '#f2c7bc', color: '#555' }}>
+              如果现实中的互动让你感到受威胁、无法拒绝或不安全，请优先离开危险情境，并联系可信赖的人、当地紧急服务或专业支持。
+            </div>
+          </motion.section>
+        )}
+
+        <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-8" aria-labelledby="dimension-results">
+          <h2 id="dimension-results" className="section-title" style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>六维度结果</h2>
+          <p className="mb-4 text-xs leading-5" style={{ color: 'var(--color-muted)' }}>
+            负担维度分数越高表示当前负担越明显；保护维度分数越高表示可用资源越充分。
+          </p>
           <div className="flex flex-col gap-3">
-            {DIMENSIONS.map((dim, i) => {
-              const score = result.dimensionScores[dim.key];
-              const isNull = score === null;
-              const color = dimensionColors[dim.key];
+            {DIMENSIONS.map((dimension, dimensionIndex) => {
+              const dimensionResult = result.dimensionResults[dimension.key];
+              const color = dimensionColors[dimension.key];
               return (
-                <motion.div
-                  key={dim.key}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.35 + i * 0.05 }}
-                  className="card"
-                  style={{ padding: '1.25rem' }}
-                >
-                  <div className="flex items-center justify-between mb-2">
+                <motion.article key={dimension.key} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 + dimensionIndex * 0.04 }} className="card" style={{ padding: '1.25rem' }}>
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{ background: color }}
-                      />
-                      <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>
-                        {dim.name}
-                      </span>
-                      <span
-                        className="tag"
-                        style={
-                          dim.layer === 'core'
-                            ? { color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }
-                            : { color: '#6b9e6b', borderColor: '#6b9e6b' }
-                        }
-                      >
-                        {dim.layer === 'core' ? '核心' : '保护'}
+                      <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
+                      <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{dimension.name}</span>
+                      <span className="tag" style={dimension.direction === 'burden' ? { color: 'var(--color-accent)', borderColor: 'var(--color-accent)' } : { color: '#557f58', borderColor: '#6b9e6b' }}>
+                        {dimension.direction === 'burden' ? '负担' : '资源'}
                       </span>
                     </div>
-                    <span className="text-mono-xs" style={{ color: isNull ? 'var(--color-muted)' : 'var(--color-ink)' }}>
-                      {isNull ? '信息不足' : `${score} · ${getScoreLevel(score)}`}
+                    <span className="text-mono-xs" style={{ color: dimensionResult.score === null ? 'var(--color-muted)' : 'var(--color-ink)' }}>
+                      {dimensionResult.score === null ? '信息不足' : `${dimensionResult.score} · ${dimensionResult.level}`}
                     </span>
                   </div>
-                  {!isNull && <ScoreBar score={score} color={color} />}
-                  <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginTop: '0.5rem' }}>
-                    {dim.description}
+                  {dimensionResult.score !== null && <ScoreBar score={dimensionResult.score} color={color} />}
+                  <p className="mt-2 text-xs leading-5" style={{ color: 'var(--color-muted)' }}>
+                    {dimension.description} · 有效题 {dimensionResult.validCount}/{dimensionResult.totalCount}
                   </p>
-                </motion.div>
+                </motion.article>
               );
             })}
           </div>
-        </motion.div>
+        </motion.section>
 
-        {/* 4. Recommendations */}
         {result.recommendations.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="card mb-8"
-            style={{ background: 'var(--color-surface)' }}
-          >
-            <h2 className="section-title" style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
-              行动建议
-            </h2>
+          <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card mb-8" style={{ background: 'var(--color-surface)' }} aria-labelledby="recommendations">
+            <h2 id="recommendations" className="section-title" style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>下一步建议</h2>
             <div className="flex flex-col gap-3">
-              {result.recommendations.map((rec, i) => (
-                <div key={i} className="flex gap-3">
-                  <span
-                    className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5"
-                    style={{
-                      background: 'rgba(217,119,87,0.12)',
-                      fontFamily: 'var(--font-mono)', fontSize: '0.55rem',
-                      color: 'var(--color-accent)',
-                    }}
-                  >
-                    {i + 1}
-                  </span>
-                  <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: '#555' }}>{rec}</p>
+              {result.recommendations.map((recommendation, index) => (
+                <div key={recommendation} className="flex gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(217,119,87,0.12)', fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--color-accent)' }}>{index + 1}</span>
+                  <p style={{ fontSize: '0.85rem', lineHeight: 1.7, color: '#555' }}>{recommendation}</p>
                 </div>
               ))}
             </div>
-          </motion.div>
+          </motion.section>
         )}
 
-        {/* 5. State Patterns */}
         {result.statePatterns.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mb-8"
-          >
-            <h2 style={{
-              fontFamily: 'var(--font-serif)', fontSize: '1.1rem',
-              color: 'var(--color-muted)', marginBottom: '0.75rem',
-            }}>
-              次级状态模式
-            </h2>
+          <section className="mb-8">
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--color-muted)', marginBottom: '0.75rem' }}>辅助理解</h2>
             <div className="flex flex-wrap gap-2">
-              {result.statePatterns.map((p) => (
-                <span key={p} className="tag">{p}</span>
-              ))}
+              {result.statePatterns.map((pattern) => <span key={pattern} className="tag">{pattern}</span>)}
             </div>
-          </motion.div>
+          </section>
         )}
 
-        {/* Share */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mb-6"
-        >
-          <ShareCard result={result} />
-        </motion.div>
+        <div className="mb-6"><ShareCard result={result} /></div>
 
-        {/* Restart & disclaimer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="flex flex-col items-center gap-4"
-        >
-          <button onClick={restart} className="btn-ghost">
-            重新测试
-          </button>
-          <p style={{ fontSize: '0.65rem', color: 'var(--color-muted)', textAlign: 'center', lineHeight: 1.6 }}>
-            本结果仅反映最近状态，可随关系情境和支持资源变化
+        <div className="flex flex-col items-center gap-4">
+          <button onClick={restart} className="btn-ghost">重新作答</button>
+          <button onClick={() => navigate('/intimacy-test')} className="cursor-pointer text-xs underline underline-offset-4" style={{ background: 'none', border: 'none', color: 'var(--color-muted)' }}>返回说明页</button>
+          <p className="text-center text-xs leading-5" style={{ color: 'var(--color-muted)' }}>
+            本结果仅反映最近状态，可随关系情境和支持资源变化。
             <br />
-            建议在私密设备上查看 · 不建议将结果用于评判他人 · 不替代专业支持
+            不建议用于评判他人、判断关系对错或替代专业支持。
           </p>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -1,37 +1,31 @@
-import type { AnswerValue, DimensionKey, TestResult } from './types';
-import { QUESTIONS, RISK_FLAGS } from './data';
+import {
+  DIMENSIONS,
+  QUESTIONNAIRE_ID,
+  QUESTIONNAIRE_VERSION,
+  QUESTIONS,
+  RISK_FLAGS,
+} from './data.ts';
+import {
+  PATTERN_RULES,
+  PROTECTIVE_HIGHLIGHTS,
+  RECOMMENDATION_RULES,
+  SCORE_THRESHOLDS,
+  SUMMARY_RULES,
+} from './rules.ts';
+import type {
+  AnswerValue,
+  DimensionKey,
+  DimensionResult,
+  ResultValidity,
+  RiskAssessment,
+  TestResult,
+} from './types.ts';
 
-function reverseScore(v: number): number {
-  return 6 - v;
-}
+const CORE_KEYS = DIMENSIONS.filter((dimension) => dimension.layer === 'core').map((dimension) => dimension.key);
+const PROTECTIVE_KEYS = DIMENSIONS.filter((dimension) => dimension.layer === 'protective').map((dimension) => dimension.key);
 
-function calcDimensionScore(
-  answers: Record<string, AnswerValue>,
-  dimension: DimensionKey,
-): number | null {
-  const qs = QUESTIONS.filter((q) => q.dimension === dimension);
-  const valid: number[] = [];
-  for (const q of qs) {
-    const a = answers[q.id];
-    if (a === 'NA' || a === undefined) continue;
-    valid.push(q.reverse ? reverseScore(a) : a);
-  }
-  if (valid.length < 3) return null;
-  const avg = valid.reduce((s, v) => s + v, 0) / valid.length;
-  return Math.round(((avg - 1) / 4) * 100);
-}
-
-function checkRiskFlags(answers: Record<string, AnswerValue>): string[] {
-  const triggered: string[] = [];
-  for (const rule of RISK_FLAGS) {
-    let count = 0;
-    for (const qid of rule.triggerQuestions) {
-      const a = answers[qid];
-      if (a !== 'NA' && a !== undefined && a >= 4) count++;
-    }
-    if (count >= rule.threshold) triggered.push(rule.id);
-  }
-  return triggered;
+function reverseScore(value: number): number {
+  return 6 - value;
 }
 
 export function getScoreLevel(score: number): string {
@@ -42,146 +36,240 @@ export function getScoreLevel(score: number): string {
   return '较高';
 }
 
-function generateStateSummary(
-  scores: Record<DimensionKey, number | null>,
-): string {
-  const eb = scores.expression_burden;
-  const sb = scores.shame_burden;
-  const rs = scores.relationship_safety;
-  const co = scores.communication_openness;
-  const sa = scores.self_acceptance;
-  const be = scores.boundary_expression;
+function calcDimensionResult(
+  answers: Record<string, AnswerValue>,
+  dimension: DimensionKey,
+): DimensionResult {
+  const meta = DIMENSIONS.find((item) => item.key === dimension);
+  if (!meta) throw new Error(`Unknown dimension: ${dimension}`);
 
-  if (eb !== null && rs !== null && eb >= 60 && rs >= 60) {
-    return '当前表达负担偏高，且你在关系中的安全感偏弱。';
-  }
-  if (sb !== null && sa !== null && sb >= 60 && sa <= 39) {
-    return '当前羞耻负担偏高，自我接纳资源偏弱。';
-  }
-  if (be !== null && eb !== null && be <= 39 && eb >= 60) {
-    return '当前边界表达较吃力，表达本身也在带来额外负担。';
-  }
-  if (co !== null && rs !== null && co <= 39 && rs >= 60) {
-    return '当前更容易在不确定中回避表达，关系安全感也偏低。';
+  const questions = QUESTIONS.filter((question) => question.dimension === dimension);
+  const validScores: number[] = [];
+
+  for (const question of questions) {
+    const answer = answers[question.id];
+    if (answer === 'NA' || answer === undefined) continue;
+    validScores.push(question.reverse ? reverseScore(answer) : answer);
   }
 
-  const coreKeys: DimensionKey[] = ['expression_burden', 'shame_burden', 'relationship_safety'];
-  const protKeys: DimensionKey[] = ['communication_openness', 'self_acceptance', 'boundary_expression'];
-
-  const allCoreLow = coreKeys.every((k) => scores[k] === null || scores[k]! < 60);
-  const protHighCount = protKeys.filter((k) => scores[k] !== null && scores[k]! >= 60).length;
-
-  if (allCoreLow && protHighCount >= 2) {
-    return '当前整体状态相对稳定，你拥有一定的表达和调节资源。';
+  const minimumValid = Math.ceil(questions.length * meta.minValidRatio);
+  if (validScores.length < minimumValid) {
+    return { score: null, level: null, validCount: validScores.length, totalCount: questions.length };
   }
 
-  // Fallback: highest burden
-  const coreScored = coreKeys
-    .filter((k) => scores[k] !== null)
-    .sort((a, b) => (scores[b]! - scores[a]!));
-  if (coreScored.length > 0 && scores[coreScored[0]]! >= 60) {
-    const names: Record<string, string> = {
-      expression_burden: '表达负担',
-      shame_burden: '羞耻负担',
-      relationship_safety: '关系安全感方面的担忧',
-    };
-    return `当前${names[coreScored[0]]}偏高，建议关注这一方面的状态。`;
-  }
-
-  return '当前整体状态处于中等水平，可以继续观察和关注。';
+  const average = validScores.reduce((sum, value) => sum + value, 0) / validScores.length;
+  const score = Math.round(((average - 1) / 4) * 100);
+  return {
+    score,
+    level: getScoreLevel(score),
+    validCount: validScores.length,
+    totalCount: questions.length,
+  };
 }
 
-function generateStatePatterns(scores: Record<DimensionKey, number | null>): string[] {
-  const patterns: string[] = [];
-  if (scores.expression_burden !== null && scores.expression_burden >= 60) patterns.push('当前表达负担偏高');
-  if (scores.shame_burden !== null && scores.shame_burden >= 60) patterns.push('当前羞耻负担偏高');
-  if (scores.relationship_safety !== null && scores.relationship_safety >= 60) patterns.push('当前关系警觉偏高');
-  if (scores.communication_openness !== null && scores.communication_openness <= 39) patterns.push('当前沟通开放度偏低');
-  if (scores.boundary_expression !== null && scores.boundary_expression <= 39) patterns.push('当前边界表达受阻');
-  if (scores.self_acceptance !== null && scores.self_acceptance <= 39) patterns.push('当前自我接纳资源偏弱');
-  return patterns;
+function checkRiskAssessments(answers: Record<string, AnswerValue>): RiskAssessment[] {
+  return RISK_FLAGS.map((rule) => {
+    const validAnswers = rule.triggerQuestions
+      .map((questionId) => answers[questionId])
+      .filter((answer): answer is Exclude<AnswerValue, 'NA'> => answer !== undefined && answer !== 'NA');
+    const triggerCount = validAnswers.filter((answer) => answer >= 4).length;
+    const missingCount = rule.triggerQuestions.length - validAnswers.length;
+
+    let status: RiskAssessment['status'] = 'clear';
+    if (triggerCount >= rule.threshold) status = 'triggered';
+    else if (triggerCount + missingCount >= rule.threshold) status = 'insufficient';
+
+    return {
+      id: rule.id,
+      status,
+      validCount: validAnswers.length,
+      totalCount: rule.triggerQuestions.length,
+    };
+  });
+}
+
+function getValidity(
+  dimensionResults: Record<DimensionKey, DimensionResult>,
+  riskAssessments: RiskAssessment[],
+): ResultValidity {
+  const computedCore = CORE_KEYS.filter((key) => dimensionResults[key].score !== null).length;
+  const computedProtective = PROTECTIVE_KEYS.filter((key) => dimensionResults[key].score !== null).length;
+  const riskComplete = riskAssessments.every((assessment) => assessment.status !== 'insufficient');
+
+  if (computedCore === CORE_KEYS.length && computedProtective === PROTECTIVE_KEYS.length && riskComplete) {
+    return 'valid';
+  }
+  if (computedCore >= 2 && computedProtective >= 2) return 'partial';
+  return 'insufficient';
+}
+
+function scoreMatches(
+  dimensionResults: Record<DimensionKey, DimensionResult>,
+  dimension: DimensionKey,
+  operator: 'gte' | 'lte',
+  value: number,
+): boolean {
+  const score = dimensionResults[dimension].score;
+  if (score === null) return false;
+  return operator === 'gte' ? score >= value : score <= value;
+}
+
+function generateStateSummary(
+  dimensionResults: Record<DimensionKey, DimensionResult>,
+  validity: ResultValidity,
+  riskFlags: string[],
+): string {
+  if (validity === 'insufficient') {
+    return '当前有效信息不足，暂时无法生成可靠的状态摘要。';
+  }
+
+  const hasLowProtectiveResource = PROTECTIVE_KEYS.some((key) => {
+    const score = dimensionResults[key].score;
+    return score !== null && score <= SCORE_THRESHOLDS.lowMaximum;
+  });
+  if (riskFlags.length > 0 && hasLowProtectiveResource) {
+    return '当前出现了需要优先关注的边界或表达信号，同时可用的保护资源相对有限。';
+  }
+
+  for (const rule of SUMMARY_RULES) {
+    const matches = rule.conditions.every((condition) =>
+      scoreMatches(dimensionResults, condition.dimension, condition.operator, condition.value),
+    );
+    if (matches) return rule.text;
+  }
+
+  const highProtectiveCount = PROTECTIVE_KEYS.filter((key) => {
+    const score = dimensionResults[key].score;
+    return score !== null && score >= SCORE_THRESHOLDS.highMinimum;
+  }).length;
+  const hasHighCore = CORE_KEYS.some((key) => {
+    const score = dimensionResults[key].score;
+    return score !== null && score >= SCORE_THRESHOLDS.highMinimum;
+  });
+
+  if (!hasHighCore && highProtectiveCount >= 2) {
+    return validity === 'partial'
+      ? '基于当前可计算的维度，你拥有一定的表达和调节资源。'
+      : '当前整体状态相对稳定，你拥有一定的表达和调节资源。';
+  }
+
+  const highestBurden = CORE_KEYS
+    .filter((key) => dimensionResults[key].score !== null)
+    .sort((left, right) => dimensionResults[right].score! - dimensionResults[left].score!)[0];
+  if (highestBurden && dimensionResults[highestBurden].score! >= SCORE_THRESHOLDS.highMinimum) {
+    const name = DIMENSIONS.find((dimension) => dimension.key === highestBurden)?.name ?? '某项负担';
+    return `当前${name}偏高，建议优先关注这一方面的状态。`;
+  }
+
+  return validity === 'partial'
+    ? '当前仅有部分维度信息可用，建议结合具体情境理解结果。'
+    : '当前各维度大多处于中等范围，可以继续观察具体情境中的变化。';
 }
 
 function generateRecommendations(
-  scores: Record<DimensionKey, number | null>,
+  dimensionResults: Record<DimensionKey, DimensionResult>,
   riskFlags: string[],
+  validity: ResultValidity,
 ): string[] {
-  const recs: string[] = [];
-
-  // Risk-based first
-  for (const flag of riskFlags) {
-    const rule = RISK_FLAGS.find((r) => r.id === flag);
-    if (rule) recs.push(rule.message);
+  if (validity === 'insufficient') {
+    return ['如你愿意，可以补充更多可判断的题目后再次查看结果。'];
   }
 
-  // High burden
-  if (scores.expression_burden !== null && scores.expression_burden >= 60) {
-    recs.push('优先练习表达边界和不适，再逐步过渡到表达偏好和需要。');
-  }
-  if (scores.shame_burden !== null && scores.shame_burden >= 60) {
-    recs.push('把注意力从"我这样正不正常"转向"这件事让我承受了什么负担"。');
-  }
-  if (scores.relationship_safety !== null && scores.relationship_safety >= 60) {
-    recs.push('在更安全的情境中做低风险表达练习，不必从最难的话题开始。');
+  const recommendations = riskFlags
+    .map((id) => RISK_FLAGS.find((rule) => rule.id === id)?.recommendation)
+    .filter((recommendation): recommendation is string => Boolean(recommendation));
+
+  for (const rule of RECOMMENDATION_RULES) {
+    if (scoreMatches(dimensionResults, rule.dimension, rule.operator, rule.value)) {
+      recommendations.push(rule.text);
+    }
   }
 
-  // Low protective
-  if (scores.boundary_expression !== null && scores.boundary_expression <= 39) {
-    recs.push('优先练习识别"不舒服但还没来得及说"的时刻，用一句简短表达先中止或放慢。');
-  }
-  if (scores.communication_openness !== null && scores.communication_openness <= 39) {
-    recs.push('从描述感受而不是解释立场开始，例如先说"我现在有点紧张 / 不确定"。');
-  }
-  if (scores.self_acceptance !== null && scores.self_acceptance <= 39) {
-    recs.push('先区分"我有这种反应"和"我就是有问题"这两件事，减少自动否定。');
-  }
+  return [...new Set(recommendations)].slice(0, 5);
+}
 
-  // Deduplicate
-  return [...new Set(recs)];
+function generatePatterns(
+  dimensionResults: Record<DimensionKey, DimensionResult>,
+  hasRisk: boolean,
+): string[] {
+  const patterns = PATTERN_RULES
+    .filter((rule) => scoreMatches(dimensionResults, rule.dimension, rule.operator, rule.value))
+    .map((rule) => rule.text);
+  return hasRisk ? patterns.slice(0, 2) : patterns;
+}
+
+function generateProtectiveHighlights(
+  dimensionResults: Record<DimensionKey, DimensionResult>,
+): string[] {
+  return PROTECTIVE_KEYS
+    .filter((key) => {
+      const score = dimensionResults[key].score;
+      return score !== null && score >= SCORE_THRESHOLDS.highMinimum;
+    })
+    .map((key) => PROTECTIVE_HIGHLIGHTS[key])
+    .filter((highlight): highlight is string => Boolean(highlight));
 }
 
 function determineShareLevel(
-  scores: Record<DimensionKey, number | null>,
+  dimensionResults: Record<DimensionKey, DimensionResult>,
+  validity: ResultValidity,
   riskFlags: string[],
-): 'minimal' | 'neutral' | 'standard' {
+): TestResult['shareLevel'] {
+  if (validity === 'insufficient') return 'none';
   if (riskFlags.length > 0) return 'minimal';
 
-  const coreKeys: DimensionKey[] = ['expression_burden', 'shame_burden', 'relationship_safety'];
-  const hasHighCore = coreKeys.some((k) => scores[k] !== null && scores[k]! >= 60);
-  if (hasHighCore) return 'neutral';
+  const hasHighCore = CORE_KEYS.some((key) => {
+    const score = dimensionResults[key].score;
+    return score !== null && score >= SCORE_THRESHOLDS.highMinimum;
+  });
+  if (hasHighCore || validity === 'partial') return 'neutral';
 
-  return 'standard';
+  const highProtectiveCount = PROTECTIVE_KEYS.filter((key) => {
+    const score = dimensionResults[key].score;
+    return score !== null && score >= SCORE_THRESHOLDS.highMinimum;
+  }).length;
+  return highProtectiveCount >= 2 ? 'standard' : 'neutral';
 }
 
 export function computeResult(answers: Record<string, AnswerValue>): TestResult {
-  const dimensionKeys: DimensionKey[] = [
-    'expression_burden', 'shame_burden', 'relationship_safety',
-    'communication_openness', 'self_acceptance', 'boundary_expression',
-  ];
-
-  const dimensionScores = {} as Record<DimensionKey, number | null>;
-  for (const key of dimensionKeys) {
-    dimensionScores[key] = calcDimensionScore(answers, key);
+  const dimensionResults = {} as Record<DimensionKey, DimensionResult>;
+  for (const dimension of DIMENSIONS) {
+    dimensionResults[dimension.key] = calcDimensionResult(answers, dimension.key);
   }
 
-  const riskFlags = checkRiskFlags(answers);
-  const stateSummary = generateStateSummary(dimensionScores);
-  const statePatterns = generateStatePatterns(dimensionScores);
-  const recommendations = generateRecommendations(dimensionScores, riskFlags);
-  const shareLevel = determineShareLevel(dimensionScores, riskFlags);
-
-  const prioritySignals: string[] = riskFlags.map((id) => {
-    const rule = RISK_FLAGS.find((r) => r.id === id);
-    return rule?.message ?? '';
-  }).filter(Boolean);
+  const riskAssessments = checkRiskAssessments(answers);
+  const riskFlags = riskAssessments
+    .filter((assessment) => assessment.status === 'triggered')
+    .map((assessment) => assessment.id);
+  const validity = getValidity(dimensionResults, riskAssessments);
+  const stateSummary = generateStateSummary(dimensionResults, validity, riskFlags);
+  const recommendations = generateRecommendations(dimensionResults, riskFlags, validity);
+  const protectiveHighlights = generateProtectiveHighlights(dimensionResults);
+  const shareLevel = determineShareLevel(dimensionResults, validity, riskFlags);
+  const shareRecommendation = riskFlags
+    .map((id) => RISK_FLAGS.find((rule) => rule.id === id)?.shareRecommendation)
+    .find((recommendation): recommendation is string => Boolean(recommendation));
 
   return {
-    dimensionScores,
+    questionnaireId: QUESTIONNAIRE_ID,
+    questionnaireVersion: QUESTIONNAIRE_VERSION,
+    validity,
+    validAnswerCount: QUESTIONS.filter((question) => {
+      const answer = answers[question.id];
+      return answer !== undefined && answer !== 'NA';
+    }).length,
+    dimensionResults,
+    riskAssessments,
     riskFlags,
+    riskAssessmentComplete: riskAssessments.every((assessment) => assessment.status !== 'insufficient'),
     stateSummary,
-    prioritySignals,
+    prioritySignals: riskFlags
+      .map((id) => RISK_FLAGS.find((rule) => rule.id === id)?.message)
+      .filter((message): message is string => Boolean(message)),
     recommendations,
     shareLevel,
-    statePatterns,
+    shareRecommendation,
+    protectiveHighlights,
+    statePatterns: validity === 'insufficient' ? [] : generatePatterns(dimensionResults, riskFlags.length > 0),
   };
 }
