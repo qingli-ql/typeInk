@@ -41,11 +41,9 @@ export const FloatingNav = () => {
 
       <div className="w-[1px] h-3 md:h-4 bg-[#4A4640] hidden sm:block" />
 
-      <a href="/builds" onClick={(e) => handleNav(e, "/builds", "Loading generative artifacts...\nDisplaying visual prototypes.")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath === '/builds' ? 'text-[#D97757]' : ''}`}>Builds</a>
-      <a href="/usage" onClick={(e) => handleNav(e, "/usage", "Analyzing workflow methodology...\nExtracting insights.")} className={`hover:text-[#D97757] transition-colors cursor-pointer hidden sm:block ${currentPath === '/usage' ? 'text-[#D97757]' : ''}`}>Usage</a>
-      <a href="/notes" onClick={(e) => handleNav(e, "/notes", "Retrieving field notes and logs...\nOpening archive.")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath.includes('/notes') ? 'text-[#D97757]' : ''}`}>Notes</a>
-      <a href="/manifesto" onClick={(e) => handleNav(e, "/manifesto", "Initializing manifesto parameters...\nReading philosophical anchors.")} className={`hover:text-[#D97757] transition-colors cursor-pointer hidden sm:block ${currentPath === '/manifesto' ? 'text-[#D97757]' : ''}`}>Manifesto</a>
-      <a href="/now" onClick={(e) => handleNav(e, "/now", "Establishing connection to current state...\nReady.")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath === '/now' ? 'text-[#D97757]' : ''}`}>Now</a>
+      <a href="/builds" onClick={(e) => handleNav(e, "/builds", "Loading selected work...")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath === '/builds' ? 'text-[#D97757]' : ''}`}>Work</a>
+      <a href="/intimacy-test" onClick={(e) => handleNav(e, "/intimacy-test", "Opening self-assessment...")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath.startsWith('/intimacy-test') ? 'text-[#D97757]' : ''}`}>Assessment</a>
+      <a href="/now" onClick={(e) => handleNav(e, "/now", "Opening current state...")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath === '/now' ? 'text-[#D97757]' : ''}`}>Now</a>
     </motion.nav>
   );
 };
