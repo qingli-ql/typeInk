@@ -11,10 +11,10 @@ export const BuildsPage = () => {
           <motion.div variants={antigravityFadeUp} className="mb-20">
             <p className="section-eyebrow">Portfolio</p>
             <h1 className="section-title" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-              What I Build with AI
+              Selected Work
             </h1>
             <p className="text-body-lg mt-4 max-w-2xl">
-              These are not "AI wrappers." Each project explores a different dimension of what becomes possible when machine intelligence is woven into the creative process from the start.
+              Two focused experiments in turning machine intelligence into calm, useful tools.
             </p>
           </motion.div>
 

@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { TypewriterProvider, useTypewriter } from "./context/TypewriterContext";
+import { TypewriterProvider } from "./context/TypewriterContext";
+import { useTypewriter } from "./context/typewriter";
 import { FloatingNav } from "./components/FloatingNav";
 import { TypewriterOverlay } from "./components/TypewriterOverlay";
 import { TypewriterToggle } from "./components/TypewriterToggle";

@@ -1,6 +1,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useTypewriter } from "../context/TypewriterContext";
+import { useTypewriter } from "../context/typewriter";
 import { IconAsterisk } from "./icons";
 import { MechanicalKeyboard } from "./MechanicalKeyboard";
 

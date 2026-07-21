@@ -1,6 +1,16 @@
 
 import { motion } from "framer-motion";
 
+const latencyBars = [
+  { peak: 13, duration: 1.1 },
+  { peak: 19, duration: 1.5 },
+  { peak: 10, duration: 0.9 },
+  { peak: 17, duration: 1.3 },
+  { peak: 21, duration: 1.7 },
+  { peak: 12, duration: 1 },
+  { peak: 16, duration: 1.4 },
+];
+
 export const VisualAmbientSystem = () => {
   const logs = [
     "> initializing cognitive matrix...",
@@ -18,7 +28,7 @@ export const VisualAmbientSystem = () => {
   ];
 
   return (
-    <div className="w-[450px] h-[380px] flex gap-6 md:gap-8 pointer-events-none opacity-40">
+    <div className="w-[400px] h-[340px] flex gap-6 pointer-events-none opacity-35">
       <div className="flex flex-col gap-8 justify-center font-mono text-[10px] uppercase tracking-widest text-[#2C2925]">
         <div>
           <div className="text-[#999] mb-1">Status</div>
@@ -30,27 +40,22 @@ export const VisualAmbientSystem = () => {
         <div>
           <div className="text-[#999] mb-1">Latency</div>
           <div className="flex items-end gap-1 h-6">
-            {Array.from({ length: 7 }).map((_, i) => (
+            {latencyBars.map((bar, i) => (
               <motion.div 
                 key={i} 
                 className="w-1 bg-[#D97757]" 
-                animate={{ height: [3, Math.random() * 15 + 6, 3] }}
-                transition={{ repeat: Infinity, duration: Math.random() * 1.2 + 0.6, ease: "easeInOut" }} 
+                animate={{ height: [3, bar.peak, 3] }}
+                transition={{ repeat: Infinity, duration: bar.duration, ease: "easeInOut" }}
               />
             ))}
           </div>
-        </div>
-        <div>
-          <div className="text-[#999] mb-1">Memory</div>
-          <div>alloc: 128mb</div>
-          <div className="text-[#D97757]">heap: 42mb</div>
         </div>
       </div>
 
       <div className="flex-1 overflow-hidden relative [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] border-l border-[#D97757]/30 pl-6">
         <motion.div
-          animate={{ y: [0, -420] }}
-          transition={{ repeat: Infinity, duration: 28, ease: "linear" }}
+          animate={{ y: [0, -380] }}
+          transition={{ repeat: Infinity, duration: 32, ease: "linear" }}
           className="flex flex-col gap-5 font-mono text-xs text-[#2C2925]"
         >
           {[...logs, ...logs, ...logs, ...logs].map((log, i) => (

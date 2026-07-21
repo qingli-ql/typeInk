@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { useTypewriter } from "../context/TypewriterContext";
+import { useTypewriter } from "../context/typewriter";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
 import { IconLink } from "../components/icons";
 

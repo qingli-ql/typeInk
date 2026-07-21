@@ -1,8 +1,9 @@
 
 import { motion, MotionValue } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useTypewriter } from "../context/TypewriterContext";
+import { useTypewriter } from "../context/typewriter";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
+import { VisualAmbientSystem } from "../components/VisualAmbientSystem";
 import { IconArrow } from "../components/icons";
 
 interface Props {
@@ -21,7 +22,7 @@ export const Hero = ({ fgX, fgY }: Props) => {
 
   return (
     <section id="top" className="min-h-screen max-w-7xl mx-auto px-6 md:px-12 pt-20 pb-10 flex items-center relative overflow-hidden xl:overflow-visible">
-      <div className="w-full">
+      <div className="grid w-full grid-cols-1 gap-12 xl:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)] xl:items-center">
         <motion.div 
           style={{ x: fgX, y: fgY }}
           initial="hidden" animate="visible" variants={staggerContainer} className="relative z-10 flex flex-col justify-center max-w-4xl"
@@ -42,6 +43,10 @@ export const Hero = ({ fgX, fgY }: Props) => {
             </button>
           </motion.div>
         </motion.div>
+
+        <div className="hidden xl:flex items-center justify-end" aria-hidden="true">
+          <VisualAmbientSystem />
+        </div>
       </div>
     </section>
   );

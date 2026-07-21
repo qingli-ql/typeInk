@@ -1,7 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTypewriter } from "../context/TypewriterContext";
+import { useTypewriter } from "../context/typewriter";
 
 export const FloatingNav = () => {
   const { triggerTypewriter } = useTypewriter();

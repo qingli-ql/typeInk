@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useParallax } from "../hooks/useParallax";
-import { useTypewriter } from "../context/TypewriterContext";
+import { useTypewriter } from "../context/typewriter";
 import { BackgroundGlow } from "../components/BackgroundGlow";
 import { Hero } from "../sections/Hero";
 import { Builds } from "../sections/Builds";

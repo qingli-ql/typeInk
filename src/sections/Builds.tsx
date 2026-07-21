@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { useTypewriter } from "../context/TypewriterContext";
+import { useTypewriter } from "../context/typewriter";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
 import { IconArrow } from "../components/icons";
 import { projects } from "../data/projects";
@@ -11,7 +11,7 @@ export const Builds = () => {
   return (
     <section id="builds" className="py-32 max-w-7xl mx-auto px-6 md:px-12 border-t border-[#EAE5D9]">
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-        <motion.h2 variants={antigravityFadeUp} className="font-serif text-3xl md:text-4xl mb-16">What I Build with AI</motion.h2>
+        <motion.h2 variants={antigravityFadeUp} className="font-serif text-3xl md:text-4xl mb-16">Selected Work</motion.h2>
         <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
           {projects.map((product) => (
             <motion.div 

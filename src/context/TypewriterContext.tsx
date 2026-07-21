@@ -1,22 +1,7 @@
-import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
-
-export interface TransitionState {
-  active: boolean;
-  text: string;
-  targetId: string;
-}
-
-export interface TypewriterContextProps {
-  transition: TransitionState;
-  displayedText: string;
-  activeKey: string | null;
-  typewriterEnabled: boolean;
-  toggleTypewriter: () => void;
-  triggerTypewriter: (e: React.MouseEvent | null, targetId: string, promptText: string) => void;
-}
-
-const TypewriterContext = createContext<TypewriterContextProps | undefined>(undefined);
+import { TypewriterContext } from "./typewriter";
+import type { TransitionState } from "./typewriter";
 
 export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
   const [transition, setTransition] = useState<TransitionState>({ active: false, text: "", targetId: "" });
@@ -78,12 +63,4 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </TypewriterContext.Provider>
   );
-};
-
-export const useTypewriter = () => {
-  const context = useContext(TypewriterContext);
-  if (!context) {
-    throw new Error("useTypewriter must be used within a TypewriterProvider");
-  }
-  return context;
 };
