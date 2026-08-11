@@ -1610,7 +1610,10 @@ body,
   min-height: 0;
   max-width: var(--app-width);
   max-height: var(--app-height);
-  overscroll-behavior: none;
+  /* Keep the full-screen book from bouncing vertically, but leave horizontal
+     overscroll to the browser so macOS trackpad swipe-back keeps working. */
+  overscroll-behavior-x: auto;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -2500,4 +2503,3 @@ body {
     max-width: 100% !important;
   }
 }
-

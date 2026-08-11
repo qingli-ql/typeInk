@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTypewriter } from "../context/typewriter";
+import { profile } from "../data/profile";
 
 export const FloatingNav = () => {
   const { triggerTypewriter } = useTypewriter();
@@ -40,13 +41,12 @@ export const FloatingNav = () => {
         className="flex items-center gap-2 group mr-2"
       >
         <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#D97757] rounded-full animate-pulse" />
-        <span className={`group-hover:text-[#D97757] transition-colors ${currentPath === '/' ? 'text-[#D97757]' : ''}`}>J.Li</span>
+        <span className={`group-hover:text-[#D97757] transition-colors ${currentPath === '/' ? 'text-[#D97757]' : ''}`}>{profile.name}</span>
       </Link>
 
       <div className="w-[1px] h-3 md:h-4 bg-[#4A4640] hidden sm:block" />
 
       <a href="/builds" onClick={(e) => handleNav(e, "/builds", "Loading selected work...")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath === '/builds' ? 'text-[#D97757]' : ''}`}>Work</a>
-      <a href="/intimacy-test" onClick={(e) => handleNav(e, "/intimacy-test", "Opening self-assessment...")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath.startsWith('/intimacy-test') ? 'text-[#D97757]' : ''}`}>Assessment</a>
       <a href="/now" onClick={(e) => handleNav(e, "/now", "Opening current state...")} className={`hover:text-[#D97757] transition-colors cursor-pointer ${currentPath === '/now' ? 'text-[#D97757]' : ''}`}>Now</a>
     </motion.nav>
   );

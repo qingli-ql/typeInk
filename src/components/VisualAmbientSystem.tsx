@@ -13,22 +13,22 @@ const latencyBars = [
 
 export const VisualAmbientSystem = () => {
   const logs = [
-    "> initializing cognitive matrix...",
-    "> parsing user intent stream...",
-    "> [sys] overriding manual heuristics",
-    "> generating dynamic UI nodes",
-    "> aligning with personal knowledge graph",
-    "> local SLM temperature: 0.4",
-    "> injecting semantic context",
-    "> await intent_resolution",
-    "> [sys] memory allocation verified",
-    "> UI rendered successfully.",
-    "> monitoring ambient environment...",
-    "> building abstraction layers..."
+    "> opening typeink workspace",
+    "> loading project index",
+    "> checking routes and links",
+    "> rendering interactive preview",
+    "> validating static assets",
+    "> testing responsive layout",
+    "> optimizing media delivery",
+    "> checking accessibility labels",
+    "> [build] all checks passed",
+    "> preview ready on localhost",
+    "> watching for changes...",
+    "> waiting for the next idea"
   ];
 
   return (
-    <div className="w-[400px] h-[340px] flex gap-6 pointer-events-none opacity-35">
+    <div className="w-[400px] h-[340px] flex gap-6 pointer-events-none opacity-55">
       <div className="flex flex-col gap-8 justify-center font-mono text-[10px] uppercase tracking-widest text-[#2C2925]">
         <div>
           <div className="text-[#999] mb-1">Status</div>
@@ -60,7 +60,7 @@ export const VisualAmbientSystem = () => {
         >
           {[...logs, ...logs, ...logs, ...logs].map((log, i) => (
             <div key={i} className="leading-relaxed opacity-80">
-              {log.includes('[sys]') ? <span className="text-[#D97757] font-bold">{log}</span> : log}
+              {log.includes('[build]') ? <span className="text-[#D97757] font-bold">{log}</span> : log}
             </div>
           ))}
         </motion.div>
