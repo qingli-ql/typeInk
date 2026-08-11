@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useTypewriter } from "../context/typewriter";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
 import { IconArrow } from "../components/icons";
+import { ProjectCover } from "../components/ProjectCover";
 import { projects } from "../data/projects";
 
 export const Builds = () => {
@@ -14,13 +15,22 @@ export const Builds = () => {
         <motion.h2 variants={antigravityFadeUp} className="font-serif text-3xl md:text-4xl mb-16">Selected Work</motion.h2>
         <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
           {projects.map((product) => (
-            <motion.div 
+            <motion.a
               key={product.slug} variants={antigravityFadeUp} 
-              className="group cursor-pointer"
-              onClick={(e) => triggerTypewriter(e, "external", `Opening documentation for ${product.name}...\nRendering interactive preview.`)}
+              href={product.url}
+              className="group cursor-pointer block"
+              onClick={(event) => {
+                if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                triggerTypewriter(
+                  event,
+                  "external",
+                  `Opening ${product.name}...\nRendering interactive preview.`,
+                  () => window.location.assign(product.url),
+                );
+              }}
             >
               <div className="w-full aspect-[4/3] rounded-lg mb-6 overflow-hidden bg-[#F4F1EA]">
-                <img src={product.image} alt={`${product.name} product interface`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" />
+                <ProjectCover project={product} className="transition-transform duration-500 group-hover:scale-[1.02]" />
               </div>
               <div className="flex justify-between items-start">
                 <div>
@@ -32,7 +42,7 @@ export const Builds = () => {
                 </div>
               </div>
               <p className="text-[#555] mt-4 text-sm leading-relaxed">{product.desc}</p>
-            </motion.div>
+            </motion.a>
           ))}
         </div>
       </motion.div>

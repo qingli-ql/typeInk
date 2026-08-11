@@ -12,7 +12,7 @@ export interface TypewriterContextProps {
   activeKey: string | null;
   typewriterEnabled: boolean;
   toggleTypewriter: () => void;
-  triggerTypewriter: (e: React.MouseEvent | null, targetId: string, promptText: string) => void;
+  triggerTypewriter: (e: React.MouseEvent | null, targetId: string, promptText: string, onComplete?: () => void) => void;
 }
 
 export const TypewriterContext = createContext<TypewriterContextProps | undefined>(undefined);

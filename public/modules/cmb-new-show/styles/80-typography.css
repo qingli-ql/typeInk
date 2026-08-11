@@ -1,0 +1,210 @@
+/* ========================================================================== 
+   UNIFIED BOOK TYPOGRAPHY
+   The bundled face is the single source for Chinese editorial copy. Latin,
+   folios and counters retain a stable serif fallback to avoid width drift.
+   ========================================================================== */
+:root {
+  --font-book-cn: "CMB Kaiti", "AR PL KaitiM GB", "STKaiti", "KaiTi", serif;
+  --font-book-latin: var(--font-book-cn);
+  --font-toc-cn: var(--font-book-cn);
+  --font-display-cn: var(--font-book-cn);
+  --font-body-cn: var(--font-book-cn);
+}
+
+#app,
+#app *,
+#app button,
+#app input,
+#app textarea,
+#app select {
+  font-family: var(--font-book-cn) !important;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Native 400 is sharper than browser-synthesised bold for the bundled face. */
+.rail-brand b,
+.rail-heading em,
+.chapter-link-copy b,
+.chapter-link-copy small,
+.chapter-subpage b,
+.rail-footer,
+.reader-breadcrumb > b,
+.reader-breadcrumb > em,
+.page-copy h1,
+.story-page h1,
+.story-page h2,
+.finale-copy h1,
+.cover-board h1,
+.subtitle,
+.body-copy,
+.body-copy p,
+.page-copy p,
+.page-note,
+blockquote,
+.cover-board > p,
+.cover-theme-line,
+.cover-description,
+.finale-copy p,
+.values-core h1,
+.values-core p,
+.values-moment strong,
+.values-keyword,
+.values-brand-name b,
+.values-group h2,
+.values-group p,
+.origin-count strong,
+.cmb-logo-fallback b {
+  font-family: var(--font-book-cn) !important;
+  font-synthesis: none !important;
+}
+
+/* Contents: larger optical sizes and calmer spacing survive browser scaling. */
+.rail-heading em {
+  font-size: clamp(24px, 1.65vw, 29px) !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
+  letter-spacing: .2em !important;
+}
+.chapter-link-copy b,
+.chapter-link-copy small,
+.chapter-subpage b,
+.rail-footer {
+  font-family: var(--font-book-cn) !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.chapter-link-copy b {
+  font-size: clamp(18px, 1.3vw, 21px) !important;
+  font-synthesis: weight !important;
+  font-weight: 550 !important;
+  line-height: 1.3 !important;
+  letter-spacing: .045em !important;
+}
+.chapter-link-copy small {
+  font-size: clamp(12px, .8vw, 13.5px) !important;
+  font-synthesis: weight !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  letter-spacing: .035em !important;
+}
+.chapter-subpage b {
+  font-size: clamp(13px, .86vw, 14.5px) !important;
+  font-synthesis: weight !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  letter-spacing: .02em !important;
+}
+.rail-footer {
+  font-size: clamp(10.5px, .7vw, 12px) !important;
+  line-height: 1.5 !important;
+  letter-spacing: .055em !important;
+}
+.chapter-link-number { font-size: clamp(18px, 1.25vw, 21px) !important; }
+.chapter-link-page { font-size: clamp(10px, .68vw, 12px) !important; font-weight: 600 !important; }
+.chapter-subpage span,
+.chapter-subpage i { font-size: clamp(9px, .62vw, 11px) !important; font-weight: 600 !important; }
+.chapter-link { min-height: 74px !important; }
+.chapter-subpage { min-height: 34px !important; }
+
+/* The bundled Kaiti file contains one native weight. Enable synthetic weight
+   only for hierarchy anchors; applying it to paragraphs makes the strokes
+   muddy after the whole book is scaled. */
+.rail-brand b,
+.chapter-link-copy b,
+.chapter-group.is-active .chapter-link-copy b,
+.chapter-subpage.is-active b,
+.page-copy h1,
+.story-page h1,
+.story-page h2,
+.finale-copy h1,
+.cover-board h1,
+.values-core h1,
+.values-brand-name b,
+.origin-count strong,
+.values-moment strong,
+.values-keyword,
+.reader-controls button {
+  font-synthesis: weight !important;
+  font-weight: 600 !important;
+}
+.chapter-group.is-active .chapter-link-copy b,
+.chapter-subpage.is-active b,
+.values-brand-name b,
+.cover-board h1 {
+  font-weight: 600 !important;
+}
+
+/* Small active labels need a tiny optical reinforcement instead of a heavier
+   paragraph weight. */
+.chapter-subpage.is-active b,
+.reader-breadcrumb > b,
+.page-note,
+.culture-note {
+  -webkit-text-stroke: .06px currentColor;
+}
+
+/* Long-form copy: one readable rhythm across every page template. */
+.body-copy,
+.page-copy .body-copy,
+.story-page .body-copy,
+.chapter-copy p,
+.stack-copy p,
+.video-copy p,
+.letter-copy p,
+.dense-copy p,
+.focus-copy p,
+.mosaic-caption-card p,
+.collab-copy p,
+.polaroid-copy p,
+.value-orbit-copy p,
+.service-steps-copy p,
+.suzhou-routes-copy p,
+.video-editorial-copy p {
+  font-family: var(--font-book-cn) !important;
+  font-size: clamp(13.5px, .86vw, 16.5px) !important;
+  font-synthesis: weight !important;
+  font-weight: 500 !important;
+  line-height: 1.72 !important;
+  letter-spacing: .018em !important;
+}
+
+/* Catch paragraph variants owned by individual templates so no page falls
+   back to the overly thin native 400 weight. */
+#app .story-page p,
+#app .story-page li,
+#app .story-page blockquote,
+#app .page-note,
+#app .subtitle,
+#app .cover-description,
+#app .cover-theme-line {
+  font-synthesis: weight !important;
+  font-weight: 500 !important;
+}
+
+/* Folios, counters and Latin labels use the same bundled family as the book. */
+.chapter-link-number,
+.chapter-link-page,
+.chapter-subpage span,
+.chapter-subpage i,
+.chapter-mark,
+.page-number,
+.left-folio,
+.origin-count strong,
+.rail-heading span,
+.rail-brand small,
+.reader-status small,
+.kicker[lang="en"] {
+  font-family: var(--font-book-cn) !important;
+  font-synthesis: none !important;
+}
+
+@media (max-width: 1100px), (max-height: 720px) {
+  .chapter-link-copy b { font-size: 17px !important; }
+  .chapter-link-copy small { font-size: 11.5px !important; }
+  .chapter-subpage b { font-size: 12.5px !important; }
+  .body-copy,
+  .page-copy .body-copy,
+  .story-page .body-copy { font-size: 13.5px !important; }
+}

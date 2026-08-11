@@ -11,6 +11,8 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
 
   const typeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const keyReleaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const completionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const completionCallbackRef = useRef<(() => void) | null>(null);
 
   const toggleTypewriter = () => setTypewriterEnabled(prev => !prev);
 
@@ -37,8 +39,11 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
 
           typeTimeoutRef.current = setTimeout(typeNextChar, nextDelay);
         } else {
-          setTimeout(() => {
+          completionTimeoutRef.current = setTimeout(() => {
+            const onComplete = completionCallbackRef.current;
+            completionCallbackRef.current = null;
             setTransition({ active: false, text: "", targetId: "" });
+            onComplete?.();
           }, 800);
         }
       };
@@ -48,13 +53,18 @@ export const TypewriterProvider = ({ children }: { children: ReactNode }) => {
       return () => {
         clearTimeout(typeTimeoutRef.current as ReturnType<typeof setTimeout>);
         clearTimeout(keyReleaseTimeoutRef.current as ReturnType<typeof setTimeout>);
+        clearTimeout(completionTimeoutRef.current as ReturnType<typeof setTimeout>);
       };
     }
   }, [transition]);
 
-  const triggerTypewriter = (e: React.MouseEvent | null, targetId: string, promptText: string) => {
+  const triggerTypewriter = (e: React.MouseEvent | null, targetId: string, promptText: string, onComplete?: () => void) => {
     if (e) e.preventDefault();
-    if (!typewriterEnabled) return; // skip if disabled
+    if (!typewriterEnabled) {
+      onComplete?.();
+      return;
+    }
+    completionCallbackRef.current = onComplete ?? null;
     setTransition({ active: true, text: promptText, targetId: targetId });
   };
 

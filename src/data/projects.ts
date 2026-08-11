@@ -1,5 +1,18 @@
 export const projects = [
   {
+    slug: 'cmb-new-show',
+    name: '招聚韶华 · 向阳启航',
+    type: 'Interactive Story',
+    homeType: 'Interactive Brand Story',
+    status: 'Live',
+    year: '2026',
+    tags: ['Storytelling', 'Brand', 'Interactive'],
+    image: '/images/cmb-new-show.png',
+    url: '/modules/cmb-new-show/',
+    desc: '招商银行苏州分行 2026 届新员工培训成长纪实，以可交互翻页、章节叙事和影音素材呈现从校园到职场的成长旅程。',
+    detail: '独立静态交互体验，包含响应式画册、自动播放、音乐、视频与多种编辑式版面，并与作品集共用同一部署入口。',
+  },
+  {
     slug: 'tone-studio',
     name: 'Tone Studio',
     type: 'Visual Tool',
@@ -10,6 +23,7 @@ export const projects = [
     image: '/images/tone-studio.png',
     desc: "An AI-native photo grading concept. Instead of sliders, you describe the mood - 'melancholic dusk', 'brutalist concrete' - and a semantic preset engine does the rest.",
     detail: 'Built with a local SLM pipeline for inference, a custom LUT rendering engine, and a bespoke UI inspired by early film editing consoles.',
+    url: '/builds#tone-studio',
   },
   {
     slug: 'cognitive-mirror',
@@ -22,5 +36,6 @@ export const projects = [
     image: '/images/cognitive-mirror.png',
     desc: 'A personal AI agent trained on 2+ years of daily notes, voice memos, and reading highlights. It surfaces forgotten ideas and acts as a sounding board for half-formed thoughts.',
     detail: 'Runs locally via Ollama. Uses a custom RAG architecture with a personal knowledge graph as its memory backbone. Zero cloud dependency.',
+    url: '/builds#cognitive-mirror',
   },
 ] as const;

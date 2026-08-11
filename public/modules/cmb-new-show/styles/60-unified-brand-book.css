@@ -1,0 +1,137 @@
+/* Unified CMB book shell: cover, paper depth and live pages share one curve. */
+:root {
+  --book-left: 42%;
+  --reference-seam: 44px;
+  --cmb-book-red: #8b3038;
+  --cmb-archive-gold: #aa8b67;
+}
+
+.book-object {
+  grid-template-columns: minmax(0, 42fr) minmax(0, 58fr) !important;
+  isolation: isolate;
+}
+
+.book-geometry-svg {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 15px 18px rgba(0, 0, 0, .18));
+}
+.formal-cover-path {
+  fill: url(#formal-cover-red);
+  stroke: none;
+  vector-effect: non-scaling-stroke;
+}
+.formal-cover-inset {
+  fill: none;
+  stroke: rgba(255, 235, 217, .16);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.formal-paper-depth {
+  stroke: none;
+  vector-effect: non-scaling-stroke;
+}
+.formal-paper-depth.depth-back { fill: #cbbda9; }
+.formal-paper-depth.depth-mid { fill: #ded2c1; }
+.formal-paper-depth.depth-near { fill: #f0e7da; }
+
+/* The legacy rectangle/caps are replaced by the canonical SVG silhouette. */
+.cover-underlay,
+.leaf-stack,
+.page-arch { display: none !important; }
+
+.chapter-rail,
+.reader {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  clip-path: var(--page-curve-clip) !important;
+  -webkit-clip-path: var(--page-curve-clip) !important;
+  border: 0 !important;
+  outline: 0 !important;
+}
+.chapter-rail {
+  grid-column: 1 !important;
+  box-shadow: inset -18px 0 30px rgba(67,43,26,.11), inset 0 1px rgba(255,255,255,.66) !important;
+}
+.reader {
+  grid-column: 2 !important;
+  box-shadow: inset 18px 0 30px rgba(67,43,26,.11), inset 0 1px rgba(255,255,255,.72) !important;
+}
+
+.book-gutter {
+  left: calc(42% - 22px) !important;
+  width: 44px !important;
+  top: 2.2% !important;
+  bottom: 2.2% !important;
+}
+
+/* A single quiet metadata lane on the reading leaf. It reserves the right side
+   for playback tools and prevents breadcrumb/status/page labels from colliding. */
+#app:not(.is-narrow-layout) .reader-header {
+  height: 58px !important;
+  padding: 0 270px 0 44px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+#app:not(.is-narrow-layout) .reader-breadcrumb {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+#app:not(.is-narrow-layout) .reader-breadcrumb > b,
+#app:not(.is-narrow-layout) .reader-breadcrumb > em {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+#app:not(.is-narrow-layout) .reader-status {
+  right: 205px !important;
+  height: 58px !important;
+  gap: 7px !important;
+  white-space: nowrap !important;
+}
+#app:not(.is-narrow-layout) .corner-controls {
+  top: 0 !important;
+  right: 28px !important;
+  gap: 8px !important;
+}
+#app:not(.is-narrow-layout) .book-tab { width: 40px !important; height: 68px !important; }
+#app:not(.is-narrow-layout) .book-tool { width: 29px !important; height: 29px !important; margin-top: 14px !important; }
+
+/* CMB archive hierarchy: history and page metadata feel institutional, not decorative. */
+.rail-edition {
+  border-top-color: rgba(113, 73, 48, .24) !important;
+  border-bottom-color: rgba(113, 73, 48, .24) !important;
+}
+.rail-edition::before {
+  content: "CMB ARCHIVE · SUZHOU 2026";
+  display: block;
+  margin-bottom: 6px;
+  color: var(--cmb-book-red);
+  font: 7px/1 Georgia, serif;
+  letter-spacing: .18em;
+}
+.chapter-link.is-active .chapter-link-number,
+.chapter-link.is-active .chapter-link-copy b,
+.reader-breadcrumb > span { color: var(--cmb-book-red) !important; }
+.timeline-fill { background: var(--cmb-book-red) !important; }
+
+@media (max-width: 900px) {
+  .book-geometry-svg { display: none !important; }
+  .chapter-rail,
+  .reader {
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+  }
+}

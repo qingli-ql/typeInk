@@ -1,0 +1,1084 @@
+/* Final interaction and media-composition contract for the 42/58 book spread. */
+:root {
+  --final-book-aspect: 1.82;
+  --final-book-width: min(97vw, calc(91vh * var(--final-book-aspect)), 1840px);
+}
+
+#app:not(.is-narrow-layout) .book-object {
+  width: var(--final-book-width) !important;
+  aspect-ratio: var(--final-book-aspect) !important;
+  top: -1.1vh;
+  transform: none !important;
+  transform-style: flat !important;
+}
+
+/* 360/Chromium renders transformed ancestor text through a raster layer,
+   which makes small Chinese type look soft. Keep text on the normal paint path. */
+html,
+body,
+.book-object {
+  -webkit-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+/* The directory is vertically scrollable but never horizontally scrollable.
+   Hide native Chromium/WebKit, Firefox and legacy Edge/IE scrollbar chrome. */
+.chapter-list {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.chapter-list::-webkit-scrollbar,
+.chapter-list::-webkit-scrollbar-track,
+.chapter-list::-webkit-scrollbar-thumb,
+.chapter-list::-webkit-scrollbar-corner {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+#app:not(.is-narrow-layout) .desk-pen {
+  z-index: 2 !important;
+  width: clamp(128px, 9vw, 168px) !important;
+  right: max(18px, calc((100vw - var(--final-book-width)) * .5 - 18px)) !important;
+  bottom: max(98px, calc(4.5vh + 54px)) !important;
+  left: auto !important;
+  transform: rotate(-112deg) !important;
+  transform-origin: 82% 50%;
+}
+
+/* English micro-headings were inconsistently placed by different layout
+   grammars. Chinese page titles already carry the hierarchy, so content pages
+   use one clean language system. The cover's institutional line is retained. */
+.story-page:not(.layout-cover) .kicker {
+  display: none !important;
+}
+
+/* There is one physical curl renderer. The older button triangles and permanent
+   dog-ear were three additional visual layers occupying the same two corners. */
+#app:not(.is-narrow-layout) .page-corner-turn::before,
+#app:not(.is-narrow-layout) .page-corner-turn::after,
+#app:not(.is-narrow-layout) .static-page-curl {
+  display: none !important;
+}
+#app:not(.is-narrow-layout) .page-corner-turn {
+  background: transparent !important;
+}
+#app:not(.is-narrow-layout) .page-curl-preview {
+  max-width: 44% !important;
+  max-height: 48% !important;
+}
+
+/* The active subpage dot is anchored to the button. Translating that button on
+   hover moved the dot as well, which looked like a loose bullet. Keep the row
+   geometry fixed and use color as the hover feedback. */
+.chapter-subpage,
+.chapter-subpage:hover,
+.chapter-subpage:focus-visible {
+  transform: none !important;
+}
+.chapter-subpage {
+  transition: color .25s ease, background-color .25s ease !important;
+}
+.chapter-subpage:hover {
+  background: rgba(139, 48, 56, .035) !important;
+}
+
+/* All image-led layouts use the complete reading leaf while leaving the shared
+   58px metadata lane and bottom folio lane unobstructed. */
+#app:not(.is-narrow-layout) .layout-hero-mosaic,
+#app:not(.is-narrow-layout) .layout-dense-editorial,
+#app:not(.is-narrow-layout) .layout-focus-wall,
+#app:not(.is-narrow-layout) .layout-film-ribbon {
+  padding-top: 66px !important;
+  padding-bottom: 42px !important;
+}
+
+/* Dense editorial: a predictable 4 × 4 contact sheet gives 14/16-image pages
+   even coverage. The copy panel remains an intentional overlay, not a reserved
+   hole that leaves the lower half blank. */
+#app:not(.is-narrow-layout) .layout-dense-editorial {
+  padding-right: 24px !important;
+  padding-left: 24px !important;
+}
+#app:not(.is-narrow-layout) .layout-dense-editorial .dense-grid {
+  position: absolute;
+  top: 66px;
+  right: 24px;
+  bottom: 42px;
+  left: 35%;
+  width: auto;
+  height: auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+#app:not(.is-narrow-layout) .layout-dense-editorial .dense-item {
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+#app:not(.is-narrow-layout) .layout-dense-editorial .dense-copy {
+  top: 9% !important;
+  left: 3.5% !important;
+  width: min(28.5%, 300px) !important;
+  max-height: calc(100% - 118px) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  background: rgba(246, 239, 226, .9) !important;
+}
+#app:not(.is-narrow-layout) .layout-dense-editorial .dense-copy .body-copy {
+  display: block !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+#app:not(.is-narrow-layout) .layout-dense-editorial::after {
+  content: "";
+  position: absolute;
+  z-index: 9;
+  top: 12%;
+  bottom: 12%;
+  left: 32.5%;
+  width: 1px;
+  background: rgba(101, 70, 49, .2);
+  pointer-events: none;
+}
+
+/* Focus-wall cells now follow a 4-column photographic grid. */
+#app:not(.is-narrow-layout) .layout-focus-wall {
+  grid-template-columns: minmax(230px, 32%) minmax(0, 68%) !important;
+  gap: 20px !important;
+  padding-right: 34px !important;
+  padding-left: 34px !important;
+}
+#app:not(.is-narrow-layout) .layout-focus-wall .focus-wall-grid {
+  gap: 4px !important;
+}
+#app:not(.is-narrow-layout) .layout-focus-wall .focus-thumb {
+  min-width: 0;
+  min-height: 0;
+}
+/* 14 photos: fill the final four-column row instead of leaving two black cells. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-longterm"] .focus-thumb:nth-last-child(-n + 2) {
+  grid-column: span 2;
+}
+
+/* A 14-image 4×4 contact sheet uses two double-width cells in its final row,
+   avoiding an accidental blank quadrant. This applies to every dense layout
+   with exactly fourteen assets, not to a page id. */
+#app:not(.is-narrow-layout) .layout-dense-editorial .dense-grid[data-dense-count="14"] .dense-item:nth-last-child(2) {
+  grid-column: 1 / span 2 !important;
+  grid-row: 4 !important;
+}
+#app:not(.is-narrow-layout) .layout-dense-editorial .dense-grid[data-dense-count="14"] .dense-item:last-child {
+  grid-column: 3 / span 2 !important;
+  grid-row: 4 !important;
+}
+
+/* The global brand watermark belongs on editorial breathing space. Image-led
+   pages already carry brand imagery and must not have a second logo printed on
+   top of photographs. */
+.page-viewport[data-layout="dense-editorial"] .reader-brand-watermark,
+.page-viewport[data-layout="focus-wall"] .reader-brand-watermark,
+.page-viewport[data-layout="film-ribbon"] .reader-brand-watermark,
+.page-viewport[data-layout="hero-mosaic"] .reader-brand-watermark,
+.page-viewport[data-layout="polaroid-life"] .reader-brand-watermark,
+.page-viewport[data-layout="video-editorial"] .reader-brand-watermark {
+  display: none !important;
+}
+
+/* Film pages reserve a real middle editorial band. Previously the auto row was
+   shorter than its two-line title, so the heading escaped into the upper reel. */
+#app:not(.is-narrow-layout) .layout-film-ribbon {
+  grid-template-rows: minmax(0, 1fr) 148px minmax(0, 1fr) !important;
+  gap: 8px !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-copy {
+  min-height: 0;
+  height: 148px;
+  grid-template-columns: minmax(118px, .44fr) minmax(215px, .82fr) minmax(0, 1.7fr) !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  column-gap: clamp(20px, 2.2vw, 38px) !important;
+  row-gap: 7px !important;
+  padding: 13px 72px 12px 46px !important;
+  overflow: hidden;
+  box-shadow: 0 -6px 18px rgba(0,0,0,.14), 0 6px 18px rgba(0,0,0,.16) !important;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-copy .chapter-mark {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  align-self: center;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-copy h1 {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  align-self: center;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-copy h1 {
+  font-size: clamp(29px, 2.5vw, 40px) !important;
+  line-height: 1.02 !important;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-copy .body-copy {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: end;
+  display: block !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  min-width: 0;
+  max-width: 46em;
+  padding-right: 18px;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  font-size: clamp(10px, .72vw, 12px) !important;
+  line-height: 1.62 !important;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-copy .culture-note {
+  grid-column: 3;
+  grid-row: 2;
+  align-self: start;
+  margin: 0 !important;
+  padding: 6px 0 0 !important;
+  border-top: 1px solid rgba(101,70,49,.18);
+  color: #8e3439 !important;
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-row {
+  min-height: 0;
+}
+#app:not(.is-narrow-layout) .layout-film-ribbon .ribbon-frame {
+  flex-basis: clamp(160px, 17vw, 276px) !important;
+}
+
+/* Chapter 05's cinematic theme may darken the reels, but the editorial band is
+   still physical paper. Keep one explicit contrast contract here so the later
+   chapter theme cannot produce dark text on a dark translucent background. */
+.chapter-bloom.layout-film-ribbon .ribbon-copy {
+  color: #261c15 !important;
+  background-color: #f3ebdf !important;
+  background-image: linear-gradient(90deg, #e1d2bd, #f7f0e4 14%, #f7f0e4 86%, #e1d2bd) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.chapter-bloom.layout-film-ribbon .ribbon-copy .chapter-mark,
+.chapter-bloom.layout-film-ribbon .ribbon-copy .chapter-mark strong,
+.chapter-bloom.layout-film-ribbon .ribbon-copy h1 {
+  color: #261c15 !important;
+}
+.chapter-bloom.layout-film-ribbon .ribbon-copy .body-copy,
+.chapter-bloom.layout-film-ribbon .ribbon-copy .body-copy p {
+  color: #59483b !important;
+}
+.chapter-bloom.layout-film-ribbon .ribbon-copy .culture-note,
+.chapter-bloom.layout-film-ribbon .ribbon-copy .culture-note span {
+  color: #8e3439 !important;
+}
+
+/* The dark Chapter 05 opener needs a wider inner-spine safe area than light
+   paper pages; otherwise the large red chapter number and title visually touch
+   the black/red binding edge. */
+#app:not(.is-narrow-layout) .chapter-bloom.layout-chapter-opener .chapter-copy {
+  padding-left: clamp(26px, 2.4vw, 40px) !important;
+  padding-right: clamp(20px, 2vw, 30px) !important;
+}
+#app:not(.is-narrow-layout) .chapter-bloom.layout-chapter-opener .chapter-copy .page-copy {
+  width: 100%;
+  max-width: 34em;
+}
+
+/* Contents leaf: the watermark is the emblem alone, while two static grain
+   layers add matte paper tactility without runtime filters or animations. */
+.rail-brand-watermark.is-emblem-only {
+  left: 25% !important;
+  bottom: 12% !important;
+  width: 50% !important;
+  max-width: 50% !important;
+  opacity: .036 !important;
+  filter: none !important;
+  mix-blend-mode: multiply !important;
+  object-fit: contain;
+}
+.chapter-rail::before {
+  opacity: .34 !important;
+  background-size: 150px 150px !important;
+}
+.rail-page-inner::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  opacity: .22;
+  mix-blend-mode: multiply;
+  background-image:
+    repeating-linear-gradient(7deg, rgba(105,76,49,.035) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(97deg, rgba(255,255,255,.16) 0 1px, transparent 1px 11px),
+    radial-gradient(circle at 18% 24%, rgba(122,84,51,.055) 0 .6px, transparent .8px),
+    radial-gradient(circle at 72% 68%, rgba(255,255,255,.22) 0 .7px, transparent .9px);
+  background-size: auto, auto, 9px 11px, 13px 15px;
+}
+.rail-edition,
+.rail-mobile-close {
+  position: relative;
+  z-index: 3;
+}
+
+/* Shared split axis for 04.2 and 06.3: the rule, copy edge and image field now
+   meet at one deliberate boundary instead of leaving an inactive middle band. */
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-copy,
+#app:not(.is-narrow-layout) .layout-suzhou-routes .suzhou-routes-copy {
+  left: 4% !important;
+  width: 29% !important;
+  padding-right: 18px !important;
+  border-right: 1px solid rgba(101, 70, 49, .2) !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-stage,
+#app:not(.is-narrow-layout) .layout-suzhou-routes .suzhou-routes-stage {
+  right: 1% !important;
+  width: 70% !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-stage {
+  top: 6% !important;
+  bottom: 4% !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-core {
+  left: 61% !important;
+  top: 40% !important;
+  width: clamp(112px, 9.2vw, 164px) !important;
+  padding: 18px !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-node {
+  width: clamp(68px, 6vw, 104px) !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-node.node-4 {
+  width: clamp(62px, 5.4vw, 94px) !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-strip {
+  left: -39% !important;
+  right: 1.5% !important;
+  bottom: 0 !important;
+  height: 19% !important;
+  grid-template-columns: repeat(var(--orbit-strip-count), minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+#app:not(.is-narrow-layout) .layout-value-orbit .value-orbit-strip .media-frame {
+  border-width: 1px !important;
+}
+#app:not(.is-narrow-layout) .layout-suzhou-routes::after {
+  display: none;
+}
+
+/* 06.5 uses two non-competing vertical zones: a complete memory emblem above
+   and a concise value statement below. This prevents both the emblem and title
+   from being cut by the header, folio or each other at intermediate frames. */
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-stage {
+  top: 28% !important;
+  width: min(43%, 520px) !important;
+  height: min(43%, 410px) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  gap: 0 !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-collage {
+  width: min(100%, 340px) !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-name {
+  margin-top: 2px !important;
+  gap: 3px !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-name b {
+  font-size: clamp(29px, 3vw, 44px) !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-name span {
+  font-size: 9px !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-name {
+  position: absolute;
+  left: 50%;
+  bottom: -24px;
+  display: block !important;
+  margin: 0 !important;
+  color: #9e1f2d;
+  opacity: 1;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-brand-name b {
+  font-size: clamp(23px, 2vw, 31px) !important;
+  line-height: 1 !important;
+  letter-spacing: .16em !important;
+}
+
+/* 01.1 uses three landscape strips. This preserves faces and group scenes much
+   better than the former hero + narrow vertical thumbnail column. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-shekou"] .chapter-visual {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-shekou"] .chapter-mini-grid {
+  display: contents !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-shekou"] .chapter-hero,
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-shekou"] .chapter-mini {
+  min-width: 0;
+  min-height: 0;
+  border-radius: 2px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-shekou"] .chapter-visual img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="vision-shekou"] .chapter-visual video {
+  object-fit: cover !important;
+  object-position: center 42% !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-core {
+  /* Reveal starts 28px lower; the larger inset keeps even that first frame
+     above the folio and curved paper edge. */
+  bottom: max(68px, 7%) !important;
+  width: min(78%, 860px) !important;
+  padding: 12px 30px 13px !important;
+  background: linear-gradient(90deg, transparent, rgba(248,241,231,.96) 12%, rgba(248,241,231,.96) 88%, transparent) !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-core h1 {
+  font-size: clamp(28px, 2.8vw, 42px) !important;
+  line-height: 1.12 !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-core p {
+  margin-top: 6px !important;
+  line-height: 1.5 !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-core small {
+  margin-top: 5px !important;
+  padding-top: 5px !important;
+}
+#app:not(.is-narrow-layout) .layout-values-convergence .values-paper-veil,
+#app:not(.is-narrow-layout) .layout-values-convergence .values-group,
+#app:not(.is-narrow-layout) .layout-values-convergence .values-core {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.layout-values-convergence .values-memory-wall,
+.layout-values-convergence .values-brand-collage,
+.layout-values-convergence .values-brand-photo img,
+.layout-values-convergence .values-moment-photo img {
+  filter: none !important;
+}
+.layout-values-convergence .values-brand-grid.is-canvas-ready {
+  display: none !important;
+}
+.layout-values-convergence .values-keyword {
+  opacity: 0;
+}
+
+/* Right-page watermark is a quiet emblem, never the horizontal logo lockup.
+   Keep it subordinate to both copy and media on every performance tier. */
+.reader-brand-watermark.is-emblem-only {
+  width: min(12%, 150px) !important;
+  aspect-ratio: 1 !important;
+  opacity: .012 !important;
+  filter: blur(.35px) saturate(.68) !important;
+}
+.reader-brand-watermark.is-emblem-only img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Fourteen photos plus two 2×2 feature cards occupy exactly a 5×4 board.
+   The old 5×5 board and an extra span on card 13 pushed card 14 into a sparse
+   fifth row, leaving a large accidental blank field. */
+#app:not(.is-narrow-layout) .layout-polaroid-life .polaroid-copy {
+  width: 31% !important;
+}
+#app:not(.is-narrow-layout) .layout-polaroid-life .polaroid-copy h1 {
+  max-width: none;
+  white-space: nowrap;
+  font-size: clamp(34px, 2.35vw, 44px) !important;
+  letter-spacing: .025em !important;
+}
+#app:not(.is-narrow-layout) .layout-polaroid-life .polaroid-board[data-polaroid-count="14"] {
+  left: 37%;
+  right: 2.5%;
+  width: auto;
+  top: 7%;
+  bottom: 7%;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+#app:not(.is-narrow-layout) .layout-polaroid-life .polaroid-board[data-polaroid-count="14"] .polaroid-card:nth-child(13) {
+  grid-column: span 1;
+}
+
+/* Runtime quality tiers preserve composition while progressively removing the
+   most expensive full-page raster effects. */
+#app.is-medium-performance .story-page .media-frame,
+#app.is-low-performance .story-page .media-frame {
+  box-shadow: none !important;
+}
+#app.is-low-performance .story-page,
+#app.is-low-performance .story-page * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+#app.is-low-performance .story-page .media-frame > img,
+#app.is-low-performance .story-page .media-frame > video {
+  filter: none !important;
+}
+#app.is-low-performance .page-edge-light {
+  opacity: .45 !important;
+}
+#app.is-low-performance .reader-brand-watermark.is-emblem-only {
+  opacity: .012 !important;
+}
+
+/* Compact top command bar: breadcrumb, state and tools have separate lanes.
+   Playback is no longer a hanging bookmark competing with page content. */
+#app:not(.is-narrow-layout) .reader-header {
+  padding-right: 350px !important;
+}
+#app:not(.is-narrow-layout) .reader-status {
+  right: 222px !important;
+  height: 54px !important;
+  gap: 6px !important;
+}
+#app:not(.is-narrow-layout) .corner-controls {
+  top: 11px !important;
+  right: 27px !important;
+  align-items: center !important;
+  gap: 2px !important;
+  padding: 3px !important;
+  border: 1px solid rgba(91, 67, 47, .13);
+  border-radius: 18px;
+  background: rgba(246, 238, 225, .82);
+  box-shadow: 0 4px 14px rgba(67, 46, 29, .08), inset 0 1px rgba(255, 255, 255, .7);
+  backdrop-filter: blur(8px);
+}
+#app:not(.is-narrow-layout) .book-tab {
+  grid-template-columns: auto 16px !important;
+  grid-template-rows: 1fr !important;
+  gap: 4px;
+  width: 58px !important;
+  height: 28px !important;
+  padding: 0 7px !important;
+  border-radius: 14px !important;
+  clip-path: none !important;
+  filter: none !important;
+}
+#app:not(.is-narrow-layout) .book-tab:hover {
+  transform: none !important;
+  filter: brightness(1.07) !important;
+}
+#app:not(.is-narrow-layout) .book-tab svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+#app:not(.is-narrow-layout) .book-tool {
+  width: 28px !important;
+  height: 28px !important;
+  margin-top: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: .68;
+}
+#app:not(.is-narrow-layout) .book-tool:hover {
+  transform: none !important;
+  background: rgba(139, 48, 56, .07) !important;
+}
+
+/* Compact compatibility lane for 1280–1600px desktop browsers whose UI zoom
+   leaves less CSS width than the physical screen suggests. */
+@media (min-width: 901px) and (max-width: 1600px) {
+  #app:not(.is-narrow-layout) .reader-header {
+    padding-right: 258px !important;
+  }
+  #app:not(.is-narrow-layout) .reader-status {
+    right: 178px !important;
+    height: 50px !important;
+    gap: 4px !important;
+  }
+  #app:not(.is-narrow-layout) .reader-status .auto-status {
+    display: none !important;
+  }
+  #app:not(.is-narrow-layout) .corner-controls {
+    top: 8px !important;
+    right: 18px !important;
+    gap: 4px !important;
+    padding: 3px 5px !important;
+  }
+  #app:not(.is-narrow-layout) .book-tab {
+    width: 54px !important;
+    height: 26px !important;
+  }
+  #app:not(.is-narrow-layout) .book-tool {
+    width: 25px !important;
+    height: 25px !important;
+  }
+}
+
+/* Media must fill its designed frame consistently; focal and fit values remain
+   configurable per asset through inline custom properties. */
+.story-page .media-frame > img,
+.story-page .media-frame > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* One committed turn = one visible sheet. The former under-leaf, crease and
+   elliptical shadow were individually plausible but together read as several
+   pages turning at once. Hover still shows the same single paper corner. */
+.page-viewport.is-page-turning .curl-under-page,
+.page-viewport.is-page-turning .page-curl-preview .curl-fold,
+.page-viewport.is-page-turning .page-curl-preview .curl-shadow {
+  display: none !important;
+}
+.page-viewport.is-page-turning .page-curl-preview {
+  filter: drop-shadow(-9px -8px 15px rgba(53,34,20,.2)) !important;
+}
+.page-viewport.is-page-turning .page-curl-preview .curl-paper {
+  background: linear-gradient(137deg,
+    transparent 0 48.5%,
+    rgba(102,72,45,.16) 49.2%,
+    #fffaf1 51%,
+    #eee1ce 78%,
+    #c9b294 100%) !important;
+  box-shadow: inset -18px -14px 30px rgba(58,36,20,.13) !important;
+}
+
+/* A committed navigation uses exactly one copy of the outgoing page. The new
+   page is already underneath, so rotation progressively reveals real content
+   instead of an opaque coloured sheet. */
+.page-turn-leaf {
+  position: absolute;
+  z-index: 50;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+.page-turn-leaf.is-backward { transform-origin: right center; }
+.page-turn-leaf > .page-surface {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.page-turn-leaf::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .34;
+  background: linear-gradient(90deg,
+    rgba(55,34,20,.22) 0,
+    rgba(255,250,240,.08) 13%,
+    transparent 48%,
+    rgba(67,42,24,.28) 96%,
+    rgba(38,23,14,.4) 100%);
+  mix-blend-mode: multiply;
+}
+.page-turn-leaf.is-backward::after {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 900px) {
+  #app.is-narrow-layout .layout-hero-mosaic,
+  #app.is-narrow-layout .layout-dense-editorial,
+  #app.is-narrow-layout .layout-focus-wall,
+  #app.is-narrow-layout .layout-film-ribbon {
+    padding-top: 54px !important;
+    padding-bottom: 58px !important;
+  }
+}
+
+/* ========================================================================== 
+   Page-specific composition pass (360/Chromium desktop)
+   Keep these overrides scoped by page id: the underlying templates remain
+   reusable while each story gets the photographic proportion it needs.
+   ========================================================================== */
+
+/* 00.1: lower the opening lockup and keep the conclusion card off the fore-edge. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-depart"] .origin-count {
+  top: clamp(58px, 8.2%, 82px) !important;
+  left: clamp(38px, 6.2%, 84px) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-depart"] .origin-final-copy {
+  left: 46.5% !important;
+  bottom: clamp(42px, 7.4%, 72px) !important;
+  width: min(54%, 630px) !important;
+}
+
+/* 02.1 / 03.1: chapter-openers use landscape photographs instead of narrow
+   portrait crops. Three equal strips also preserve every frame's focal area. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-embrace"] .chapter-visual,
+#app:not(.is-narrow-layout) .page-viewport[data-page="professional-foundation"] .chapter-visual {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-embrace"] .chapter-mini-grid,
+#app:not(.is-narrow-layout) .page-viewport[data-page="professional-foundation"] .chapter-mini-grid {
+  display: contents !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-embrace"] .chapter-hero,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-embrace"] .chapter-mini,
+#app:not(.is-narrow-layout) .page-viewport[data-page="professional-foundation"] .chapter-hero,
+#app:not(.is-narrow-layout) .page-viewport[data-page="professional-foundation"] .chapter-mini {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-embrace"] .chapter-visual img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-embrace"] .chapter-visual video,
+#app:not(.is-narrow-layout) .page-viewport[data-page="professional-foundation"] .chapter-visual img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="professional-foundation"] .chapter-visual video {
+  object-fit: cover !important;
+  object-position: center 42% !important;
+}
+
+/* 04.1 follows the same proven landscape chapter-opener composition. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-side"] .chapter-visual {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-side"] .chapter-mini-grid {
+  display: contents !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-side"] .chapter-hero,
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-side"] .chapter-mini {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-side"] .chapter-visual img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-side"] .chapter-visual video {
+  object-fit: cover !important;
+  object-position: center 42% !important;
+}
+
+/* 05.1 / 06.1 use the same landscape strip system; these story photos are
+   group scenes and should never be forced into narrow portrait crops. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="real-voice"] .chapter-visual,
+#app:not(.is-narrow-layout) .page-viewport[data-page="learn-in-training"] .chapter-visual {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="real-voice"] .chapter-mini-grid,
+#app:not(.is-narrow-layout) .page-viewport[data-page="learn-in-training"] .chapter-mini-grid {
+  display: contents !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="real-voice"] .chapter-hero,
+#app:not(.is-narrow-layout) .page-viewport[data-page="real-voice"] .chapter-mini,
+#app:not(.is-narrow-layout) .page-viewport[data-page="learn-in-training"] .chapter-hero,
+#app:not(.is-narrow-layout) .page-viewport[data-page="learn-in-training"] .chapter-mini {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="real-voice"] .chapter-visual img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="real-voice"] .chapter-visual video,
+#app:not(.is-narrow-layout) .page-viewport[data-page="learn-in-training"] .chapter-visual img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="learn-in-training"] .chapter-visual video {
+  object-fit: cover !important;
+  object-position: center 42% !important;
+}
+
+/* 00.3 / 02.3: the caption card owns a strict safe area above the folio.
+   Long copy is clamped rather than being hidden behind the page edge. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-group"] .mosaic-caption-card,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-rhythm"] .mosaic-caption-card {
+  right: 5.2% !important;
+  bottom: 8.5% !important;
+  width: min(37%, 480px) !important;
+  max-height: 43% !important;
+  padding: clamp(18px, 1.8vw, 28px) !important;
+  overflow: hidden !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-group"] .mosaic-caption-card .body-copy,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-rhythm"] .mosaic-caption-card .body-copy {
+  display: block !important;
+  overflow: hidden !important;
+  margin-top: 10px !important;
+  font-size: clamp(9px, .72vw, 11px) !important;
+  line-height: 1.5 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-group"] .mosaic-caption-card .body-copy p,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-rhythm"] .mosaic-caption-card .body-copy p {
+  display: block !important;
+  margin: 0 !important;
+  -webkit-line-clamp: unset !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-group"] .mosaic-caption-card h1,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-rhythm"] .mosaic-caption-card h1 {
+  font-size: clamp(32px, 3.1vw, 48px) !important;
+  line-height: 1.02 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="opening-group"] .mosaic-caption-card .culture-note,
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-rhythm"] .mosaic-caption-card .culture-note {
+  display: none !important;
+}
+
+/* 02.2: create more air between nodes and move the visual centre toward the
+   copy, so the network reads as one composition rather than a right-side pile. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-collab"] .collab-network-field {
+  right: 4.5% !important;
+  width: 69% !important;
+  transform: translateX(-3.5%) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-collab"] .collab-node {
+  width: clamp(66px, 6.35vw, 112px) !important;
+  box-shadow: 0 10px 24px rgba(60,39,27,.16), 0 0 0 3px rgba(249,242,230,.8) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="team-collab"] .collab-hub {
+  left: 61% !important;
+}
+
+/* 03.4: give the middle editorial band enough height and align all copy around
+   a shared optical centre; no paragraph touches either film strip. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="career-responsibility"] .layout-film-ribbon {
+  grid-template-rows: minmax(0, 1fr) 172px minmax(0, 1fr) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="career-responsibility"] .ribbon-copy {
+  height: 172px !important;
+  grid-template-columns: minmax(118px,.42fr) minmax(230px,.9fr) minmax(320px,1.45fr) !important;
+  padding: 18px 78px 17px 52px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="career-responsibility"] .ribbon-copy .body-copy {
+  align-self: center !important;
+  max-width: 38em !important;
+  padding: 0 44px 0 0 !important;
+  transform: translateX(-34px) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="career-responsibility"] .ribbon-copy .culture-note {
+  transform: translateX(-34px) !important;
+  margin-right: 44px !important;
+}
+
+/* 04.2: a true circular orbit, with a slightly left-biased centre and evenly
+   framed square photos. The lower strip still spans beneath the copy. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-value"] .value-orbit-stage {
+  right: 2.5% !important;
+  width: 71.5% !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-value"] .value-orbit-core {
+  left: 56% !important;
+  top: 42% !important;
+  aspect-ratio: 1 !important;
+  border-radius: 50% !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-value"] .value-orbit-core > span {
+  display: none !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-value"] .value-orbit-node {
+  width: clamp(82px, 7.2vw, 124px) !important;
+  aspect-ratio: 1 !important;
+  border-radius: 20px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-value"] .value-orbit-node .media-frame {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-value"] .value-orbit-strip {
+  left: -20% !important;
+  right: 14% !important;
+  height: 18.5% !important;
+  gap: 10px !important;
+}
+
+/* 06.3 mirrors 04.2: one calm, slightly flattened orbit instead of a loose
+   asymmetric cloud. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-routes-stage {
+  right: 2.5% !important;
+  width: 71.5% !important;
+  top: 6% !important;
+  bottom: 5% !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-route-core {
+  left: 56% !important;
+  top: 42% !important;
+  width: clamp(112px, 9.2vw, 164px) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-route-node,
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-route-node.node-2,
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-route-node.node-3,
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-route-node.node-5 {
+  width: clamp(64px, 5.7vw, 98px) !important;
+  aspect-ratio: 1 !important;
+  border-radius: 18px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="future-suzhou"] .suzhou-route-node .media-frame {
+  border-radius: inherit !important;
+}
+
+/* 06.4: compact conclusion card in the lower-right safe zone. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="sail-sunward"] .mosaic-caption-card {
+  right: 6.5% !important;
+  bottom: 9.5% !important;
+  width: min(34%, 440px) !important;
+  max-height: 40% !important;
+  padding: clamp(17px, 1.7vw, 25px) !important;
+  overflow: hidden !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="sail-sunward"] .mosaic-caption-card h1 {
+  font-size: clamp(34px, 3.2vw, 50px) !important;
+  line-height: 1.02 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="sail-sunward"] .mosaic-caption-card .body-copy {
+  margin-top: 10px !important;
+  font-size: clamp(9px, .72vw, 11px) !important;
+  line-height: 1.5 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="sail-sunward"] .mosaic-caption-card .body-copy p {
+  display: block !important;
+  margin: 0 !important;
+  -webkit-line-clamp: unset !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="sail-sunward"] .mosaic-caption-card .culture-note {
+  display: none !important;
+}
+
+/* 06.5 brand signature: stronger and lower, while leaving the value statement
+   untouched. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-brand-name {
+  left: 50% !important;
+  transform: translate(-50%, 14px) !important;
+  text-align: center !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-brand-name b {
+  font-size: clamp(40px, 4.25vw, 66px) !important;
+  line-height: 1 !important;
+}
+
+/* 04.4: remove the contact sheet's heavy black slab. Individual cells provide
+   separation through paper-coloured gutters and a restrained soft edge. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="culture-action"] .focus-wall-grid {
+  background: transparent !important;
+  gap: 8px !important;
+  box-shadow: none !important;
+  padding: 3px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="culture-action"] .focus-thumb {
+  border-radius: 12px !important;
+  box-shadow: 0 5px 14px rgba(57,39,28,.12) !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="culture-action"] .focus-thumb .media-frame {
+  border-radius: inherit !important;
+}
+
+/* 04.3 now has four assets per lane. The original four-row grid was designed
+   for six assets and left its final row empty; three explicit rows make every
+   candidate frame consume the full available lane. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-lane-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: minmax(0, 1.04fr) minmax(0, .92fr) minmax(0, 1.04fr) !important;
+  height: 100% !important;
+  align-content: stretch !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo:nth-child(1),
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo:nth-child(4) {
+  grid-column: 1 / -1 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo:nth-child(1) { grid-row: 1 !important; }
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo:nth-child(2) { grid-column: 1 !important; grid-row: 2 !important; }
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo:nth-child(3) { grid-column: 2 !important; grid-row: 2 !important; }
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo:nth-child(4) { grid-row: 3 !important; }
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo .media-frame,
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo img,
+#app:not(.is-narrow-layout) .page-viewport[data-page="customer-extra"] .service-step-photo video {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* 06.5 final composition: one emblem, one independent wordmark and one concise
+   closing statement. This final override replaces the accumulated historical
+   offsets that pulled the wordmark back over the emblem. */
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-brand-stage {
+  top: 30% !important;
+  width: min(48%, 540px) !important;
+  height: 40% !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-brand-collage {
+  width: min(100%, 310px) !important;
+  height: min(100%, 310px) !important;
+  align-self: center !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-brand-name {
+  position: absolute !important;
+  z-index: 8 !important;
+  left: 50% !important;
+  right: auto !important;
+  top: 55% !important;
+  bottom: auto !important;
+  display: block !important;
+  width: max-content !important;
+  margin: 0 !important;
+  opacity: 0;
+  transform: translateX(-50%) !important;
+  text-align: center !important;
+  will-change: auto !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-brand-name b {
+  display: block !important;
+  font-size: clamp(42px, 3.6vw, 58px) !important;
+  line-height: 1 !important;
+  letter-spacing: .12em !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .page-viewport[data-page="values-convergence"] .values-brand-name {
+    opacity: 1 !important;
+  }
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-core {
+  left: 50% !important;
+  bottom: max(72px, 8%) !important;
+  width: min(68%, 760px) !important;
+  padding: 18px 24px 16px !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(143,91,67,.2) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-core h1 {
+  margin: 0 !important;
+  font-size: clamp(30px, 2.75vw, 42px) !important;
+  line-height: 1.08 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-core p {
+  max-width: 680px !important;
+  margin: 11px auto 0 !important;
+  font-size: clamp(12px, .9vw, 15px) !important;
+  line-height: 1.5 !important;
+}
+#app:not(.is-narrow-layout) .page-viewport[data-page="values-convergence"] .values-core small {
+  display: none !important;
+}

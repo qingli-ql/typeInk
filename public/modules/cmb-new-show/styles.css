@@ -1,0 +1,17 @@
+@import url("./styles/00-foundation.css");
+@import url("./styles/10-paper-book.css");
+@import url("./styles/20-interactions.css");
+@import url("./styles/30-story-layouts.css");
+@import url("./styles/40-final-geometry.css");
+@import url("./styles/50-reference-geometry.css?v=5");
+@import url("./styles/60-unified-brand-book.css?v=3");
+@import url("./styles/70-layout-balance.css?v=44");
+@import url("./styles/80-typography.css?v=5");
+
+@font-face {
+  font-family: "CMB Kaiti";
+  src: url("./styles/gkai00mp.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}

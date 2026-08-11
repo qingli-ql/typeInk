@@ -1,0 +1,925 @@
+   REAL BOOK GEOMETRY · screenshot-verified iteration
+   The center seam is concave at the outer silhouette; outer page edges remain
+   longer. Text stays on mostly flat compositing layers to preserve sharpness.
+   ========================================================================== */
+:root {
+  --real-book-w: min(94vw, 1810px);
+  --real-book-h: min(90vh, 900px);
+  --book-left: clamp(560px, 39vw, 720px);
+  --curve-depth: 32px;
+  --page-open-angle: 4.5deg;
+  --cover-red-1: #7a332c;
+  --cover-red-2: #571f1a;
+  --cover-red-3: #351310;
+}
+
+.experience {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+  place-items: center !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background: #1c0e0c;
+}
+.desk-surface {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 31% 20%, rgba(244,182,132,.11), transparent 31%),
+    radial-gradient(ellipse at 74% 75%, rgba(0,0,0,.28), transparent 46%),
+    repeating-linear-gradient(92deg, rgba(255,255,255,.014) 0 1px, transparent 1px 78px),
+    repeating-linear-gradient(3deg, transparent 0 57px, rgba(0,0,0,.04) 58px 59px),
+    linear-gradient(118deg, #47261f 0%, #592a23 24%, #321613 60%, #180b0a 100%);
+}
+.desk-surface::before { opacity: .44; }
+.desk-surface::after {
+  background:
+    linear-gradient(120deg, rgba(255,210,166,.07), transparent 30%),
+    radial-gradient(ellipse at 50% 45%, transparent 36%, rgba(0,0,0,.18) 62%, rgba(0,0,0,.52));
+}
+
+.book-object {
+  position: relative;
+  width: var(--real-book-w) !important;
+  height: var(--real-book-h) !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-height: 580px;
+  margin: 0 !important;
+  transform: translateY(-.4vh) !important;
+  filter: none !important;
+  transform-style: preserve-3d;
+}
+.book-object::before {
+  content: "";
+  position: absolute;
+  z-index: -7;
+  left: 5%; right: 5%; bottom: -24px; height: 46px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.43);
+  filter: blur(22px);
+  pointer-events: none;
+}
+
+.cover-underlay {
+  inset: -22px -28px -27px -28px !important;
+  z-index: -5 !important;
+  border-radius: 25px !important;
+  background:
+    radial-gradient(circle at 22% 15%, rgba(255,255,255,.11), transparent 26%),
+    linear-gradient(160deg, rgba(255,255,255,.06), transparent 15%, transparent 76%, rgba(0,0,0,.22)),
+    linear-gradient(142deg, var(--cover-red-1), var(--cover-red-2) 48%, var(--cover-red-3));
+  box-shadow:
+    0 5px 0 #2b100e,
+    0 16px 30px rgba(0,0,0,.30),
+    inset 0 0 0 1px rgba(255,220,186,.08),
+    inset 0 -22px 35px rgba(0,0,0,.21) !important;
+}
+.cover-underlay::before {
+  content:"";
+  position:absolute;
+  inset:9px;
+  border-radius:19px;
+  background: repeating-linear-gradient(137deg, rgba(255,255,255,.012) 0 2px, transparent 2px 8px);
+  box-shadow: inset 0 0 0 1px rgba(246,193,151,.12), inset 0 0 0 7px rgba(70,23,20,.12);
+}
+.cover-underlay::after { inset: 14px !important; border-radius: 16px !important; }
+
+/* multiple visible page layers */
+.leaf-stack {
+  z-index: -2 !important;
+  top: 4px !important;
+  bottom: -13px !important;
+  background: repeating-linear-gradient(180deg, #cbb99d 0 1px, #f1e7d7 1px 3px, #d8c7ae 3px 4px) !important;
+  box-shadow: 0 8px 16px rgba(0,0,0,.18) !important;
+}
+.leaf-stack::before,.leaf-stack::after { content:""; position:absolute; pointer-events:none; background:inherit; }
+.leaf-left { left:-8px !important; width:calc(var(--book-left) - 2px) !important; border-radius:18px 0 0 24px !important; }
+.leaf-left::before { inset: 3px 8px -5px -7px; opacity:.55; border-radius:17px 0 0 22px; }
+.leaf-left::after { inset: 7px 14px -9px -11px; opacity:.30; border-radius:15px 0 0 20px; }
+.leaf-right { left:calc(var(--book-left) + 2px) !important; right:-9px !important; border-radius:0 18px 24px 0 !important; }
+.leaf-right::before { inset:3px -7px -5px 8px; opacity:.55; border-radius:0 17px 22px 0; }
+.leaf-right::after { inset:7px -11px -9px 14px; opacity:.30; border-radius:0 15px 20px 0; }
+
+/* Keep page content crisp; only a small Y-opening angle is used. */
+.chapter-rail {
+  transform-origin: right center !important;
+  transform: perspective(3200px) rotateY(var(--page-open-angle)) !important;
+  border-radius: 22px 0 0 28px !important;
+  background:
+    linear-gradient(90deg, rgba(92,62,39,.08), transparent 8%, transparent 90%, rgba(59,38,23,.18)),
+    radial-gradient(circle at 18% 15%, rgba(255,255,255,.68), transparent 29%),
+    linear-gradient(180deg,#ecdfca,#f0e5d3 26%,#e8d8c0) !important;
+  box-shadow: inset -30px 0 32px rgba(55,35,21,.13), inset 0 1px rgba(255,255,255,.75) !important;
+}
+.reader {
+  transform-origin: left center !important;
+  transform: perspective(3200px) rotateY(calc(var(--page-open-angle) * -1)) !important;
+  border-radius: 0 22px 28px 0 !important;
+  background:
+    linear-gradient(90deg, rgba(52,32,19,.20), transparent 6.5%, transparent 94%, rgba(75,48,28,.07)),
+    radial-gradient(circle at 79% 14%, rgba(255,255,255,.38), transparent 31%),
+    linear-gradient(180deg,#f4eadb,#f6ede1 22%,#ebdcc7) !important;
+  box-shadow: inset 30px 0 34px rgba(55,35,21,.14), inset 0 1px rgba(255,255,255,.80) !important;
+}
+
+.page-stack,.page-viewport,.page-surface,.story-page,.turn-sheet,.sheet-front,.sheet-back,.transition-veil {
+  border-radius: 0 22px 28px 0 !important;
+}
+.stack-one { transform:translate(6px,5px) !important; background:#d8c5a8 !important; opacity:.68 !important; }
+.stack-two { transform:translate(11px,9px) !important; background:#c3aa87 !important; opacity:.40 !important; }
+.stack-three { transform:translate(16px,13px) !important; background:#9f8262 !important; opacity:.20 !important; }
+
+/* Dark, rounded center gutter. Bottom cap visually cuts the page inward so the
+   center is SHORTER while the outer edges remain longer. */
+.book-gutter {
+  z-index: 66 !important;
+  left:calc(var(--book-left) - 34px) !important;
+  width:68px !important;
+  top:-2px !important;
+  bottom:-3px !important;
+  background: radial-gradient(ellipse at center, rgba(34,19,12,.48), rgba(72,47,29,.14) 38%, transparent 77%) !important;
+}
+.book-gutter::before { width:2px !important; box-shadow:0 0 18px rgba(29,17,10,.32) !important; }
+.book-gutter::after {
+  content:"";
+  position:absolute;
+  z-index:10;
+  left:50%;
+  bottom:-7px;
+  width:calc(var(--curve-depth) * 4.4);
+  height:calc(var(--curve-depth) + 9px);
+  transform:translateX(-50%);
+  border-radius: 54% 54% 22% 22% / 100% 100% 25% 25%;
+  background:
+    repeating-linear-gradient(180deg, rgba(242,226,204,.28) 0 1px, rgba(112,78,50,.20) 1px 3px),
+    linear-gradient(180deg,#7b4a32,#3f2117 58%,#5a211b 100%);
+  box-shadow: 0 -5px 10px rgba(43,25,16,.16), inset 0 1px rgba(255,244,225,.15);
+}
+.book-gutter i::after {
+  content:"";
+  position:absolute;
+  left:50%; top:-4px;
+  width:calc(var(--curve-depth) * 3.1);
+  height:calc(var(--curve-depth) * .55);
+  transform:translateX(-50%);
+  border-radius:0 0 55% 55% / 0 0 100% 100%;
+  background:rgba(61,36,22,.30);
+  filter:blur(.4px);
+}
+
+/* paper grain and asymmetric directional light */
+.story-page::after { opacity:.13 !important; }
+.page-surface::after {
+  content:"";
+  position:absolute;
+  z-index:37;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(125deg, rgba(255,245,224,.10), transparent 32%, transparent 70%, rgba(75,45,27,.035)),
+    radial-gradient(circle at 82% 12%, rgba(255,255,255,.12), transparent 30%);
+}
+
+/* idle lower-right corner: only the TOP PAPER is lifted. */
+.static-page-curl {
+  position:absolute;
+  z-index:43;
+  right:-1px;
+  bottom:-1px;
+  width:clamp(74px,7.2vw,118px);
+  height:clamp(64px,7.8vh,94px);
+  pointer-events:none;
+  overflow:visible;
+}
+.static-page-curl::before {
+  content:"";
+  position:absolute;
+  inset:14% 0 0 18%;
+  clip-path:polygon(46% 100%,100% 24%,100% 100%);
+  background:linear-gradient(145deg,var(--cover-red-1),var(--cover-red-2) 58%,var(--cover-red-3));
+  box-shadow:-4px -4px 12px rgba(0,0,0,.16);
+}
+.static-page-curl::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  clip-path:polygon(7% 100%,100% 4%,100% 67%,69% 100%);
+  border-radius:0 0 0 36px;
+  background:
+    linear-gradient(138deg,transparent 0 43%,rgba(116,84,57,.10) 45%,#fff8ec 48%,#f1e5d3 70%,#cbb494 100%);
+  filter:drop-shadow(-8px -6px 8px rgba(64,39,23,.17));
+}
+.page-viewport.is-curling .static-page-curl,
+.page-viewport.is-page-turning .static-page-curl { opacity:0; }
+
+/* Interactive curl remains inside the right leaf. */
+.page-viewport { overflow:hidden !important; }
+.page-curl-preview { max-width:72% !important; max-height:72% !important; }
+.page-curl-preview .curl-shadow { opacity:.48; }
+
+.desk-pen {
+  position:fixed;
+  z-index:2;
+  left:max(14px,calc((100vw - var(--real-book-w))/2 - 24px));
+  bottom:max(36px,calc((100vh - var(--real-book-h))/2 + 24px));
+  width:clamp(145px,12vw,220px);
+  height:17px;
+  transform:rotate(-58deg);
+  pointer-events:none;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.32));
+}
+.desk-pen::before { content:""; position:absolute; inset:0 18px 0 0; border-radius:999px; background:linear-gradient(#241c18,#080707 55%,#2a201b); box-shadow:inset 0 1px rgba(255,255,255,.12); }
+.desk-pen::after { content:""; position:absolute; right:-2px; top:-1px; width:30px; height:19px; clip-path:polygon(0 50%,52% 0,100% 50%,52% 100%); background:linear-gradient(90deg,#9a6a3e,#e7c89e 47%,#9c6b3c); }
+.desk-pen i { position:absolute; right:28px; top:-1px; width:9px; height:19px; border-radius:4px; background:linear-gradient(#a77545,#e4c195,#88603c); }
+
+@media (max-width:900px) {
+  :root { --book-left:0px; --page-open-angle:0deg; --curve-depth:18px; }
+  .book-object { width:100% !important; height:100% !important; transform:none !important; }
+  .chapter-rail,.reader { transform:none !important; }
+  .desk-pen,.book-gutter::after,.book-gutter i::after,.static-page-curl { display:none !important; }
+}
+
+/* screenshot correction: center the whole book and use one smooth center notch */
+.book-object {
+  justify-self: center !important;
+  align-self: center !important;
+  position: relative !important;
+  inset: auto !important;
+}
+/* Suppress the older split cap; one centered sculpt is more book-like. */
+.book-gutter::after { display:none !important; }
+.center-page-notch {
+  position:absolute;
+  z-index:95;
+  left:var(--book-left);
+  bottom:-5px;
+  width:calc(var(--curve-depth) * 4.7);
+  height:calc(var(--curve-depth) + 8px);
+  transform:translateX(-50%);
+  border-radius:52% 52% 16% 16% / 100% 100% 24% 24%;
+  background:linear-gradient(180deg,#60251f 0%,#431713 52%,#2c100e 100%);
+  box-shadow:
+    0 -7px 12px rgba(52,30,18,.15),
+    inset 0 1px rgba(255,229,201,.06),
+    0 4px 8px rgba(0,0,0,.20);
+  pointer-events:none;
+}
+.center-page-notch::before {
+  content:"";
+  position:absolute;
+  left:8%; right:8%; top:-5px;
+  height:10px;
+  border-radius:50% 50% 18% 18% / 100% 100% 25% 25%;
+  background:repeating-linear-gradient(180deg,#d4c2a5 0 1px,#f3e8d6 1px 3px,#bba184 3px 4px);
+  box-shadow:0 -2px 5px rgba(52,31,19,.10), inset 0 1px rgba(255,255,255,.45);
+}
+.center-page-notch::after {
+  content:"";
+  position:absolute;
+  left:50%; top:-8px;
+  width:18%; height:72%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:linear-gradient(90deg,transparent,rgba(35,20,12,.30),transparent);
+  filter:blur(3px);
+}
+@media (max-width:900px){.center-page-notch{display:none!important;}}
+
+
+/* final silhouette correction: narrow real gutter + large rounded visual arch */
+.center-page-notch { display:none !important; }
+.chapter-rail {
+  border-radius:22px 0 44px 28px !important;
+  overflow:hidden !important;
+}
+.reader {
+  border-radius:0 22px 28px 44px !important;
+  overflow:hidden !important;
+}
+.page-stack,.page-viewport,.page-surface,.story-page,.turn-sheet,.sheet-front,.sheet-back,.transition-veil {
+  border-radius:0 22px 28px 38px !important;
+}
+.book-gutter {
+  left:calc(var(--book-left) - 20px) !important;
+  width:40px !important;
+  background:radial-gradient(ellipse at center,rgba(34,19,12,.42),rgba(72,47,29,.10) 37%,transparent 76%) !important;
+}
+.book-gutter::before { width:2px !important; }
+.book-gutter i { left:calc(50% + 4px) !important; }
+
+
+/* ========================================================================== 
+   CLARITY FIRST · 2026-08-10
+   Keep text and SVG map on native 2D layers. Book curvature is expressed by
+   silhouette/shadows/page stacks instead of rasterizing the entire spread.
+   ========================================================================== */
+.chapter-rail,
+.reader {
+  transform: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+  backface-visibility: visible !important;
+  will-change: auto !important;
+}
+.book-object {
+  transform: translateY(-.35vh) !important;
+  transform-style: flat !important;
+}
+.page-viewport,
+.page-surface,
+.story-page {
+  transform-style: flat !important;
+  backface-visibility: visible !important;
+}
+
+/* Keep the map fully vector and avoid SVG filter rasterization. */
+.origin-map-svg,
+.origin-map-svg * {
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+.layout-origin-map .china-outline,
+.layout-origin-map .china-taiwan,
+.layout-origin-map .china-island,
+.layout-origin-map .origin-route,
+.layout-origin-map .origin-source > circle:first-child,
+.layout-origin-map .suzhou-core {
+  filter: none !important;
+}
+.layout-origin-map .china-outline {
+  stroke-width: .40 !important;
+  stroke: rgba(171,28,45,.96) !important;
+}
+.layout-origin-map .china-island,
+.layout-origin-map .china-taiwan {
+  stroke-width: .34 !important;
+}
+.layout-origin-map .origin-route {
+  stroke-width: .34 !important;
+  opacity: .92;
+}
+.layout-origin-map .origin-source > circle:first-child {
+  stroke: rgba(255,248,239,.92);
+  stroke-width: .10;
+}
+.layout-origin-map .origin-source-halo {
+  stroke-width: .18 !important;
+}
+.layout-origin-map .suzhou-label {
+  font-size: 2.35px !important;
+  font-weight: 700;
+}
+
+/* Slight type-size lift without scaling the page bitmap. */
+.body-copy { font-size: clamp(12px, 1vw, 15px) !important; }
+.subtitle { font-size: clamp(15px, 1.32vw, 20px) !important; }
+.page-copy h1 { font-size: clamp(34px, 3.8vw, 64px) !important; }
+.reader-breadcrumb > b { font-size: 11px !important; }
+.reader-breadcrumb > em { font-size: 10px !important; }
+
+/* Keep the visible paper/cover volume while content remains 2D-sharp. */
+.chapter-rail {
+  box-shadow:
+    inset -42px 0 42px rgba(55,35,21,.15),
+    inset 0 1px rgba(255,255,255,.76),
+    0 12px 22px rgba(55,35,21,.055) !important;
+}
+.reader {
+  box-shadow:
+    inset 42px 0 44px rgba(55,35,21,.16),
+    inset 0 1px rgba(255,255,255,.82),
+    0 12px 22px rgba(55,35,21,.05) !important;
+}
+
+@media (max-width:900px) {
+  .chapter-rail,.reader { transform:none !important; }
+}
+
+/* ========================================================================== 
+   FINAL 5% TOP-VIEW PAGE ARCH · 2026-08-10
+   Confirmed geometry: low biased parabola from gutter to outer edge.
+   The curve is drawn as a separate physical-paper silhouette; content stays 2D.
+   ========================================================================== */
+:root {
+  --page-arch-height: clamp(15px, 2.15vh, 22px);
+}
+
+/* No ancestor perspective/scale/filter on text, photos or SVG maps. */
+.book-object,
+.chapter-rail,
+.reader,
+.book-shell,
+.page-viewport,
+.page-surface,
+.story-page {
+  transform: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+  backface-visibility: visible !important;
+}
+.book-object { filter: none !important; }
+
+/* Keep the book large and centered while leaving enough desk/cover visible. */
+.experience {
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  grid-template-rows:1fr !important;
+  place-items:center !important;
+  padding:0 !important;
+}
+.book-object {
+  width:min(94vw,1810px) !important;
+  height:min(88vh,890px) !important;
+  max-width:none !important;
+  max-height:none !important;
+  min-height:580px;
+  justify-self:center !important;
+  align-self:center !important;
+  position:relative !important;
+  inset:auto !important;
+  margin:0 !important;
+}
+
+/* The actual readable sheets stay rectangular and crisp. The caps below form
+   the subtle top/bottom silhouette without clipping or rasterizing content. */
+.chapter-rail {
+  border-radius:15px 0 0 18px !important;
+  overflow:hidden !important;
+}
+.reader {
+  border-radius:0 15px 18px 0 !important;
+  overflow:visible !important;
+}
+.page-stack,
+.page-viewport,
+.page-surface,
+.story-page,
+.turn-sheet,
+.sheet-front,
+.sheet-back,
+.transition-veil {
+  border-radius:0 15px 18px 0 !important;
+}
+
+.page-arch {
+  position:absolute;
+  z-index:6;
+  height:var(--page-arch-height);
+  pointer-events:none;
+  overflow:visible;
+}
+.page-arch-left {
+  left:0;
+  width:var(--book-left);
+}
+.page-arch-right {
+  left:var(--book-left);
+  right:0;
+}
+.page-arch-top {
+  top:calc(var(--page-arch-height) * -1 + 1px);
+}
+.page-arch-bottom {
+  bottom:calc(var(--page-arch-height) * -1 + 1px);
+  transform:scaleY(-1) !important;
+}
+.page-arch svg {
+  display:block;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+.page-arch .arch-layer { vector-effect:non-scaling-stroke; }
+.page-arch .arch-layer-back { fill:#bea98a; opacity:.48; }
+.page-arch .arch-layer-mid { fill:#d2c0a3; opacity:.65; }
+.page-arch .arch-layer-near { fill:#e2d3bc; opacity:.82; }
+.page-arch .arch-layer-surface {
+  stroke:rgba(111,82,57,.16);
+  stroke-width:.18;
+}
+.page-arch-left .arch-layer-surface { filter:none; }
+.page-arch-right .arch-layer-surface { filter:none; }
+
+/* Narrow, deep gutter: physical depth without transforming the readable page. */
+.book-gutter {
+  left:calc(var(--book-left) - 21px) !important;
+  width:42px !important;
+  top:calc(var(--page-arch-height) * -.18) !important;
+  bottom:calc(var(--page-arch-height) * -.18) !important;
+  z-index:66 !important;
+  background:radial-gradient(ellipse at center,rgba(31,17,11,.48),rgba(69,43,26,.14) 36%,transparent 76%) !important;
+}
+.book-gutter::before {
+  width:2px !important;
+  box-shadow:0 0 16px rgba(27,16,10,.32) !important;
+}
+.book-gutter::after,
+.book-gutter i::after,
+.center-page-notch { display:none !important; }
+.book-gutter i { left:calc(50% + 4px) !important; }
+
+/* Retain the already-verified layered paper thickness. */
+.leaf-stack {
+  z-index:-2 !important;
+  top:3px !important;
+  bottom:-12px !important;
+  background:repeating-linear-gradient(180deg,#cab89d 0 1px,#f0e6d6 1px 3px,#d4c2a7 3px 4px) !important;
+  box-shadow:0 8px 16px rgba(0,0,0,.17) !important;
+}
+.leaf-left { left:-7px !important; border-radius:18px 0 0 22px !important; }
+.leaf-right { right:-8px !important; border-radius:0 18px 22px 0 !important; }
+.stack-one { transform:translate(5px,4px) !important; }
+.stack-two { transform:translate(9px,8px) !important; }
+.stack-three { transform:translate(13px,11px) !important; }
+
+/* Map remains vector-sharp. Remove every glow/filter on the map geometry. */
+.origin-map-svg,
+.origin-map-svg * {
+  shape-rendering:geometricPrecision;
+  text-rendering:geometricPrecision;
+}
+.layout-origin-map .origin-map-svg,
+.layout-origin-map .origin-map-svg *,
+.layout-origin-map .suzhou-node {
+  filter:none !important;
+}
+.layout-origin-map .china-outline {
+  stroke-width:.40 !important;
+  stroke:rgba(171,28,45,.96) !important;
+}
+.layout-origin-map .china-island,
+.layout-origin-map .china-taiwan { stroke-width:.34 !important; }
+.layout-origin-map .origin-route { stroke-width:.34 !important; opacity:.92 !important; }
+.layout-origin-map .origin-source > circle:first-child {
+  stroke:rgba(255,248,239,.94) !important;
+  stroke-width:.10 !important;
+}
+.layout-origin-map .origin-source-halo { stroke-width:.18 !important; }
+.layout-origin-map .suzhou-label { font-size:2.35px !important; font-weight:700 !important; }
+
+/* Only the paper corner lifts. Interactive page-turn geometry stays clipped
+   inside the right leaf so no extra white sheet can escape below the book. */
+.page-viewport { overflow:hidden !important; }
+.static-page-curl {
+  width:clamp(64px,5.8vw,96px) !important;
+  height:clamp(54px,6.4vh,78px) !important;
+}
+.page-curl-preview {
+  max-width:72% !important;
+  max-height:72% !important;
+}
+
+@media (max-width:900px) {
+  :root { --page-arch-height:0px; }
+  .page-arch { display:none !important; }
+  .book-object { width:100% !important; height:100% !important; }
+  .book-gutter { display:none !important; }
+}
+
+
+/* ========================================================================== 
+   FINAL 5% TOP / 3% BOTTOM CURVED PAPER SURFACE · 2026-08-10
+   Top and bottom share the same biased parabola but use different amplitudes.
+   The readable page surface expands with the shell; no GPU scale/perspective is used.
+   ========================================================================== */
+:root {
+  --page-curve-top: clamp(28px, 4.8vh, 44px);
+  --page-curve-bottom: clamp(17px, 2.9vh, 27px);
+  --page-arch-top-height: var(--page-curve-top);
+  --page-arch-bottom-height: var(--page-curve-bottom);
+}
+
+/* The actual left/right paper sheets follow the function. Their content area
+   grows with the paper, instead of being left in the old rectangular height. */
+.chapter-rail,
+.reader {
+  height: calc(100% + var(--page-curve-top) + var(--page-curve-bottom)) !important;
+  margin-top: calc(var(--page-curve-top) * -1) !important;
+  margin-bottom: calc(var(--page-curve-bottom) * -1) !important;
+  clip-path: var(--page-curve-clip) !important;
+  -webkit-clip-path: var(--page-curve-clip) !important;
+  overflow: hidden !important;
+}
+
+/* Use most of the extra curved paper as real layout space. We only reserve a
+   small safety band at the extreme tips, so images/layouts stretch with the page
+   while text does not get clipped by the outer corners. */
+.rail-page-inner {
+  padding-top: calc(clamp(38px, 5vh, 65px) + var(--page-curve-top) * .34) !important;
+  padding-bottom: calc(clamp(35px, 4.5vh, 58px) + var(--page-curve-bottom) * .30) !important;
+}
+.reader-header { top: calc(var(--page-curve-top) * .30) !important; }
+.book-stage {
+  inset: calc(var(--page-curve-top) * .24) 0 calc(var(--page-curve-bottom) * .22) 0 !important;
+}
+.reader-controls {
+  top: calc(var(--page-curve-top) * .18) !important;
+  bottom: calc(var(--page-curve-bottom) * .18) !important;
+}
+
+/* Physical paper caps: top 5%, bottom 3%. */
+.page-arch-top {
+  height: var(--page-arch-top-height) !important;
+  top: calc(var(--page-arch-top-height) * -1 + 1px) !important;
+}
+.page-arch-bottom {
+  height: var(--page-arch-bottom-height) !important;
+  bottom: calc(var(--page-arch-bottom-height) * -1 + 1px) !important;
+  transform: scaleY(-1) !important;
+}
+.page-arch .arch-layer-surface {
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  stroke: rgba(111,82,57,.12) !important;
+  stroke-width:.14 !important;
+}
+
+/* Gutter follows the asymmetric sheet instead of extending equally at top/bottom. */
+.book-gutter {
+  top: calc(var(--page-curve-top) * -.16) !important;
+  bottom: calc(var(--page-curve-bottom) * -.16) !important;
+}
+
+.media-frame {
+  background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(214,198,177,.20)), #e7dccb;
+}
+.media-frame > img[data-deferred-src],
+.media-frame > img.is-media-loading { opacity:0; }
+.media-frame > img { transition:opacity .22s ease; }
+.media-frame > img.is-media-ready { opacity:1; }
+.media-frame > img.is-media-error { opacity:.18; }
+.page-copy,.body-copy,.chapter-copy,.stack-copy,.video-copy,.letter-copy,.dense-copy,.focus-copy,.mosaic-caption-card,
+.collab-copy,.polaroid-copy,.value-orbit-copy,.service-steps-copy,.suzhou-routes-copy,.video-editorial-copy {
+  min-width:0; max-width:100%; overflow-wrap:anywhere; word-break:break-word; text-wrap:pretty;
+}
+.body-copy,.page-copy p { max-width:100%; }
+.dense-copy,.mosaic-caption-card { background:rgba(246,239,226,.988) !important; }
+.layout-focus-wall .focus-copy,.layout-stack-deck .stack-copy,.layout-video-editorial .video-editorial-copy,
+.layout-collab-network .collab-copy,.layout-polaroid-life .polaroid-copy,.layout-value-orbit .value-orbit-copy,
+.layout-service-steps .service-steps-copy,.layout-suzhou-routes .suzhou-routes-copy { contain:layout paint; }
+
+@media (max-width:900px) {
+  :root {
+    --page-curve-top:0px;
+    --page-curve-bottom:0px;
+    --page-arch-top-height:0px;
+    --page-arch-bottom-height:0px;
+  }
+  .page-arch { display:none !important; }
+  .chapter-rail,.reader {
+    height:100% !important;
+    margin:0 !important;
+    clip-path:none !important;
+    -webkit-clip-path:none !important;
+  }
+  .rail-page-inner {
+    padding-top:clamp(38px,5vh,65px) !important;
+    padding-bottom:clamp(35px,4.5vh,58px) !important;
+  }
+  .reader-header { top:0 !important; }
+  .book-stage { inset:0 !important; }
+  .reader-controls { top:0 !important; bottom:0 !important; }
+}
+
+/* ========================================================================== 
+   FINAL RIGHT-PAGE RECTANGLE + TYPOGRAPHY CONSOLIDATION · 2026-08-10
+   Left physical-book curvature is retained. The readable right leaf returns
+   to the original crisp rectangle so content cannot be clipped by the shell.
+   ========================================================================== */
+:root {
+  --font-display-cn: "Source Han Serif SC", "Noto Serif CJK SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --font-body-cn: "Source Han Sans SC", "Noto Sans CJK SC", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", "Heiti SC", Arial, sans-serif;
+}
+
+/* Right reading leaf: restore old rectangular content geometry. */
+.reader {
+  height: 100% !important;
+  margin: 0 !important;
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  overflow: visible !important;
+  transform: none !important;
+  perspective: none !important;
+  filter: none !important;
+}
+.reader-header { top: 0 !important; }
+.book-stage { inset: 0 !important; }
+.reader-controls { inset: 0 !important; top: 0 !important; bottom: 0 !important; }
+
+/* Right paper edge is straight again. Keep only the left physical arch. */
+.page-arch-right { display: none !important; }
+
+.reader .book-shell,
+.reader .page-stack,
+.reader .page-viewport,
+.reader .page-surface,
+.reader .story-page,
+.reader .turn-sheet,
+.reader .sheet-front,
+.reader .sheet-back,
+.reader .transition-veil {
+  top: 0 !important;
+  bottom: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Open-source display/body typography stacks. */
+html, body, button, input, textarea, select {
+  font-family: var(--font-body-cn);
+}
+
+.story-page,
+.body-copy,
+.body-copy p,
+.page-copy p,
+.values-body,
+.origin-copy p,
+.chapter-copy p,
+.stack-copy p,
+.video-copy p,
+.letter-copy p,
+.dense-copy p,
+.focus-copy p,
+.mosaic-caption-card p,
+.collab-copy p,
+.polaroid-copy p,
+.value-orbit-copy p,
+.service-steps-copy p,
+.suzhou-routes-copy p,
+.video-editorial-copy p {
+  font-family: var(--font-body-cn) !important;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Body copy gets one consistent, readable size across layouts. */
+.body-copy,
+.page-copy .body-copy,
+.story-page .body-copy {
+  font-size: clamp(13px, .82vw, 16px) !important;
+  line-height: 1.72 !important;
+  letter-spacing: .012em;
+}
+.body-copy p,
+.page-copy p,
+.story-page p { line-height: inherit; }
+
+/* Editorial serif for chapter/title hierarchy. */
+.page-copy h1,
+.story-page h1,
+.story-page h2,
+.chapter-link-copy b,
+.rail-heading em,
+.values-brand-name b,
+.origin-final-copy h1,
+.finale-copy h1 {
+  font-family: var(--font-display-cn) !important;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+.page-copy h1,
+.story-page h1 {
+  font-weight: 600;
+  letter-spacing: .025em;
+}
+
+/* Small navigation text uses sans instead of thin FangSong. */
+.chapter-link-copy small,
+.chapter-subpage b,
+.reader-breadcrumb > b,
+.reader-breadcrumb > em,
+.rail-edition,
+.rail-footer,
+.chapter-mark,
+.kicker {
+  font-family: var(--font-body-cn) !important;
+  font-synthesis: none;
+}
+.chapter-link-copy b { font-weight: 600; }
+.chapter-subpage b { font-weight: 500; }
+.reader-breadcrumb > b { font-size: 11px !important; font-weight: 600 !important; }
+.reader-breadcrumb > em { font-size: 10px !important; }
+
+/* Keep copy inside its assigned region rather than painting over media. */
+.body-copy,
+.page-copy,
+.chapter-copy,
+.stack-copy,
+.video-copy,
+.letter-copy,
+.dense-copy,
+.focus-copy,
+.mosaic-caption-card,
+.collab-copy,
+.polaroid-copy,
+.value-orbit-copy,
+.service-steps-copy,
+.suzhou-routes-copy,
+.video-editorial-copy {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+@media (max-width: 900px) {
+  .reader {
+    height: 100% !important;
+    margin: 0 !important;
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+  }
+  .body-copy,
+  .page-copy .body-copy,
+  .story-page .body-copy {
+    font-size: clamp(11px, 2.7vw, 14px) !important;
+    line-height: 1.62 !important;
+  }
+}
+
+
+/* ========================================================================== 
+   FINAL REFERENCE SILHOUETTE + AUTO START · 2026-08-10
+   The physical right-paper cap follows the approved low asymmetric arch again,
+   while the actual readable right page remains a crisp rectangular 2D region.
+   ========================================================================== */
+/* Restore the physical right-page silhouette only. The reader/content itself
+   stays rectangular because of the rules above. */
+.page-arch-right { display:block !important; }
+
+/* Match the confirmed top-view proportion: 5% top silhouette / 3% bottom. */
+:root {
+  --page-curve-top: clamp(28px, 4.8vh, 44px);
+  --page-curve-bottom: clamp(17px, 2.9vh, 27px);
+  --page-arch-top-height: var(--page-curve-top);
+  --page-arch-bottom-height: var(--page-curve-bottom);
+}
+.page-arch-top {
+  height:var(--page-arch-top-height) !important;
+  top:calc(var(--page-arch-top-height) * -1 + 1px) !important;
+}
+.page-arch-bottom {
+  height:var(--page-arch-bottom-height) !important;
+  bottom:calc(var(--page-arch-bottom-height) * -1 + 1px) !important;
+  transform:scaleY(-1) !important;
+}
+
+/* Keep right content absolutely rectangular and sharp even though a curved
+   physical-paper cap is visible outside it. */
+.reader,
+.reader .book-shell,
+.reader .page-stack,
+.reader .page-viewport,
+.reader .page-surface,
+.reader .story-page,
+.reader .turn-sheet,
+.reader .sheet-front,
+.reader .sheet-back,
+.reader .transition-veil {
+  clip-path:none !important;
+  -webkit-clip-path:none !important;
+  transform:none !important;
+  perspective:none !important;
+  filter:none !important;
+}
+.reader {
+  height:100% !important;
+  margin:0 !important;
+  overflow:visible !important;
+}
+.reader .book-shell,
+.reader .page-stack,
+.reader .page-viewport,
+.reader .page-surface,
+.reader .story-page,
+.reader .turn-sheet,
+.reader .sheet-front,
+.reader .sheet-back,
+.reader .transition-veil {
+  top:0 !important;
+  bottom:0 !important;
+  height:100% !important;
+  max-height:100% !important;
+}
+.reader-header { top:0 !important; }
+.book-stage { inset:0 !important; }
+.reader-controls { top:0 !important; bottom:0 !important; }
+
+/* Ensure the curved caps look like layered paper rather than a decorative line. */
+.page-arch .arch-layer-back { opacity:.50 !important; }
+.page-arch .arch-layer-mid { opacity:.58 !important; }
+.page-arch .arch-layer-near { opacity:.72 !important; }
+.page-arch .arch-layer-surface {
+  opacity:1 !important;
+  stroke:rgba(103,76,54,.20) !important;
+  stroke-width:.18 !important;
+}
+
+@media (max-width:900px) {
+  .page-arch { display:none !important; }
+}
+
