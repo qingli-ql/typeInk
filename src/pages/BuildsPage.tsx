@@ -1,13 +1,10 @@
 import { motion } from "framer-motion";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
 import { Footer } from "../sections/Footer";
-import { projects } from "../data/projects";
+import { publicProjects } from "../data/projects";
 import { ProjectCover } from "../components/ProjectCover";
-import { useTypewriter } from "../context/typewriter";
 
 export const BuildsPage = () => {
-  const { triggerTypewriter } = useTypewriter();
-
   return (
     <main className="relative z-10 w-full overflow-x-hidden min-h-screen pt-24">
       <div className="page-container">
@@ -18,12 +15,12 @@ export const BuildsPage = () => {
               Selected Work
             </h1>
             <p className="text-body-lg mt-4 max-w-2xl">
-              Three focused experiments across interactive storytelling and calm, useful intelligent tools.
+              Two focused experiments in turning machine intelligence into calm, useful tools.
             </p>
           </motion.div>
 
           <div className="flex flex-col gap-16">
-            {projects.map((project) => (
+            {publicProjects.map((project) => (
               <motion.article
                 key={project.slug}
                 id={project.slug}
@@ -44,7 +41,7 @@ export const BuildsPage = () => {
                     <div className="flex gap-4 text-mono-xs" style={{ color: 'var(--color-muted)' }}>
                       <span>{project.year}</span>
                       <span>·</span>
-                      <span style={{ color: project.status === 'Active' || project.status === 'Live' ? 'var(--color-accent)' : 'inherit' }}>
+                      <span style={{ color: project.status === 'Active' ? 'var(--color-accent)' : 'inherit' }}>
                         {project.status}
                       </span>
                     </div>
@@ -66,20 +63,6 @@ export const BuildsPage = () => {
                     <p className="text-mono-xs mb-1" style={{ color: 'var(--color-accent)' }}>Technical Note</p>
                     <p className="text-sm leading-relaxed" style={{ color: '#666' }}>{project.detail}</p>
                   </div>
-                  {project.slug === 'cmb-new-show' && (
-                    <a
-                      href={project.url}
-                      onClick={(event) => triggerTypewriter(
-                        event,
-                        "external",
-                        `Opening ${project.name}...\nRendering interactive preview.`,
-                        () => window.location.assign(project.url),
-                      )}
-                      className="font-mono text-sm border-b border-[#2C2925] text-[#2C2925] pb-1 w-fit hover:pr-4 hover:text-[#D97757] hover:border-[#D97757] transition-all duration-300"
-                    >
-                      Open interactive story ↗
-                    </a>
-                  )}
                 </div>
               </motion.article>
             ))}

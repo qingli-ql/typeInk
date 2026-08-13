@@ -4,7 +4,7 @@ import { useTypewriter } from "../context/typewriter";
 import { antigravityFadeUp, staggerContainer } from "../utils/animations";
 import { IconArrow } from "../components/icons";
 import { ProjectCover } from "../components/ProjectCover";
-import { projects } from "../data/projects";
+import { publicProjects } from "../data/projects";
 
 export const Builds = () => {
   const { triggerTypewriter } = useTypewriter();
@@ -14,7 +14,7 @@ export const Builds = () => {
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
         <motion.h2 variants={antigravityFadeUp} className="font-serif text-3xl md:text-4xl mb-16">Selected Work</motion.h2>
         <div className="grid md:grid-cols-2 gap-x-8 gap-y-16">
-          {projects.map((product) => (
+          {publicProjects.map((product) => (
             <motion.a
               key={product.slug} variants={antigravityFadeUp} 
               href={product.url}

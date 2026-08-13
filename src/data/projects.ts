@@ -1,6 +1,7 @@
 export const projects = [
   {
     slug: 'cmb-new-show',
+    isPublic: false,
     name: '招聚韶华 · 向阳启航',
     type: 'Interactive Story',
     homeType: 'Interactive Brand Story',
@@ -14,6 +15,7 @@ export const projects = [
   },
   {
     slug: 'tone-studio',
+    isPublic: true,
     name: 'Tone Studio',
     type: 'Visual Tool',
     homeType: 'Online Color Tool',
@@ -27,6 +29,7 @@ export const projects = [
   },
   {
     slug: 'cognitive-mirror',
+    isPublic: true,
     name: 'Cognitive Mirror',
     type: 'Personal Agent',
     homeType: 'Personal Agent',
@@ -39,3 +42,7 @@ export const projects = [
     url: '/builds#cognitive-mirror',
   },
 ] as const;
+
+// Keep private/paused projects registered so their direct URLs remain usable,
+// while public portfolio surfaces only render explicitly published entries.
+export const publicProjects = projects.filter((project) => project.isPublic);
